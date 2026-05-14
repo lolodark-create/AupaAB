@@ -75,12 +75,16 @@ function isRelevantToAB(item) {
   return false;
 }
 
+// Order = priority. Most specific patterns first.
+// "espoirs" sits before "match" so Crabos/U18 stories don't get caught by the
+// generic "victoire" word in their snippets.
 const CLASS_RULES = [
-  ['mercato',     /\b(signe|prolong[eé]|prolongation|quitte|recrute|recrutement|d[eé]part|arriv[eé]e|mercato|transfert|rumeur)/i],
-  ['match',       /\b(match|score|victoire|d[eé]faite|r[eé]sultat|composition|compo|avant[\s-]match|apr[eè]s[\s-]match|coup\s?d['’]envoi|kick[\s-]?off|j-?\d+)\b/i],
-  ['espoirs',     /\b(jeune|espoir|formation|centre\s+(de\s+)?formation|crabos|reichel|u\s?-?\s?(16|18|20)\b)/i],
-  ['pays_basque', /\b(pays\s+basque|biarritz|anglet|saint[\s-]jean[\s-]de[\s-]luz|festival|euskara|euskal)/i],
-  ['coulisses',   /\b(analyse|interview|coulisses|coulisse|strat[eé]gie|tactique|d[eé]cryptage|portrait|chronique)/i],
+  ['mercato',     /\b(signe|signature|prolong[eé]|prolongation|quitte|recrute|recrutement|d[eé]part|arriv[eé]e|mercato|transfert|rumeur|cl[oô]ture\s+du\s+mercato|s['’]engage|paraphe)/i],
+  ['espoirs',     /\b(crabos|reichel|u\s?-?\s?(16|18|20)\b|centre\s+(de\s+)?formation|jeune\s+(joueur|talent|espoir)|p[eé]pinière|cadets)/i],
+  ['coulisses',   /\b(analyse|interview|coulisses?|strat[eé]gie|tactique|d[eé]cryptage|portrait|chronique|confidences?|témoignage|t[eé]moigne|d[eé]claration)/i],
+  // "match" catches scores, previews, post-game. Includes "s'incline", "l'emporte" — common AB titles.
+  ['match',       /\b(match|score|victoire|d[eé]faite|r[eé]sultat|composition|compo|avant[\s-]match|apr[eè]s[\s-]match|coup\s?d['’]envoi|kick[\s-]?off|j-?\d+|s['’]incline|l['’]emporte|re[çc]oit|d[eé]place|finale|demi[\s-]finale|quart|maintien|top\s?14|pro\s?d2|champions?\s+cup|challenge\s+cup|barrage|playoffs?|XV\s+de\s+d[eé]part|essai|m[eê]l[eé]e)/i],
+  ['pays_basque', /\b(pays\s+basque|biarritz\s+olympique|euskara|euskal|pelote\s+basque|ikurri[nñ]a|herri\s+urrats|fronton|ikastola)/i],
 ];
 
 function classifyArticle(title, snippet) {
