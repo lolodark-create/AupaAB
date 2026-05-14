@@ -6,45 +6,86 @@ import Prose from '~/components/Prose.astro';
 <SiteShell title="Conditions générales d'utilisation" description="Les règles d'utilisation du site AUPA AB.">
   <Prose title="Conditions générales d'utilisation" kicker="CGU" updated="14 mai 2026">
     <blockquote>
-      <strong>Squelette — à faire relire par un juriste avant production.</strong>
+      Document opposable aux utilisateurs du site. <em>Une relecture par un juriste reste recommandée pour adaptation à votre situation éditoriale et juridique précise — notamment §3 (modération auto via IA), §8 (résiliation) et §10 (juridiction).</em>
     </blockquote>
 
     <h2>1. Objet</h2>
     <p>
-      Les présentes CGU régissent l'utilisation du site <strong>AUPA AB</strong> accessible à l'adresse [domaine de production]. En utilisant le site, vous acceptez ces conditions.
+      Les présentes Conditions Générales d'Utilisation (« CGU ») régissent l'accès et l'usage du site <strong>AUPA AB</strong>, accessible à l'adresse <a href="https://aupa-ab.vercel.app">aupa-ab.vercel.app</a> et tout domaine de redirection. Le simple fait d'accéder au site implique l'acceptation pleine et entière des CGU.
     </p>
 
-    <h2>2. Accès au service</h2>
+    <h2>2. Description du service</h2>
     <p>
-      L'accès en lecture est libre et gratuit. Certaines fonctionnalités (sauvegarde d'articles, commentaires) nécessitent la création d'un compte.
+      AUPA AB est un agrégateur d'actualités <strong>non-officiel</strong> consacré à l'Aviron Bayonnais (cf. <a href="/mentions-legales">mentions légales</a>). Le service est gratuit. Il propose :
+    </p>
+    <ul>
+      <li>La consultation publique d'extraits courts d'articles agrégés depuis des sources tierces (limitée à 350 caractères par extrait, avec lien sortant systématique).</li>
+      <li>Une recherche en texte intégral sur le corpus indexé.</li>
+      <li>À partir de la phase V1.5 : la création de comptes pour sauvegarder des articles et personnaliser l'expérience.</li>
+      <li>À partir de la phase V2 : un espace de commentaires modéré.</li>
+    </ul>
+
+    <h2>3. Accès et disponibilité</h2>
+    <p>
+      L'accès est libre et gratuit, 24 h/24, sous réserve de maintenance et de cas de force majeure. AUPA AB s'efforce d'assurer une disponibilité de <strong>99,5 %</strong> mais ne garantit aucune obligation de résultat sur ce point.
     </p>
 
-    <h2>3. Création et gestion de compte</h2>
+    <h2>4. Compte utilisateur</h2>
     <p>
-      L'inscription est ouverte à toute personne majeure ou disposant d'une autorisation parentale. Un seul compte par personne. Vous êtes responsable de la confidentialité de vos identifiants.
+      L'inscription est ouverte à toute personne âgée d'au moins <strong>15 ans</strong> (article 8 RGPD France). Un seul compte par personne physique. Vous êtes responsable de la confidentialité de vos identifiants et de toute action effectuée depuis votre compte.
+    </p>
+    <p>
+      AUPA AB peut suspendre ou supprimer un compte qui violerait les présentes CGU, la <a href="/charte">charte communautaire</a> ou la loi, après notification et délai de contestation de 7 jours (sauf urgence ou faute grave).
     </p>
 
-    <h2>4. Contenu des utilisateurs</h2>
+    <h2>5. Contenu utilisateur (commentaires, à partir de la V2)</h2>
     <p>
-      En postant un commentaire, vous accordez à AUPA AB une licence non-exclusive, mondiale et gratuite pour le diffuser sur le site. Vous restez propriétaire de votre contenu.
+      En publiant un commentaire, vous concédez à AUPA AB une licence <strong>non-exclusive, mondiale, gratuite et révocable</strong> aux fins exclusives de diffusion sur le site. Vous restez propriétaire de votre contenu et pouvez le supprimer à tout moment depuis votre profil.
     </p>
     <p>
-      Vous êtes seul responsable de ce que vous publiez. AUPA AB se réserve le droit de modérer, masquer ou supprimer tout contenu contraire à la <a href="/charte">charte communautaire</a> ou à la loi.
-    </p>
-
-    <h2>5. Propriété intellectuelle</h2>
-    <p>
-      Les actualités agrégées appartiennent à leurs éditeurs respectifs. Voir <a href="/mentions-legales">mentions légales</a>.
+      Vous garantissez que votre contenu ne viole aucun droit de tiers (droit d'auteur, vie privée, image) et qu'il respecte la <a href="/charte">charte communautaire</a>.
     </p>
 
-    <h2>6. Responsabilité</h2>
+    <h2>6. Modération</h2>
     <p>
-      Le site est fourni "en l'état". AUPA AB s'efforce d'assurer la disponibilité, l'exactitude et la sécurité mais ne peut être tenu responsable d'éventuelles interruptions, erreurs ou pertes de données.
+      Les commentaires sont soumis à une <strong>modération automatique</strong> (analyse de toxicité par intelligence artificielle, fournisseur Anthropic) qui peut entraîner :
+    </p>
+    <ul>
+      <li>L'acceptation immédiate (score ≤ 50 %).</li>
+      <li>Une mise en file d'attente pour modération humaine (score entre 50 et 85 %).</li>
+      <li>Le rejet automatique (score ≥ 85 %).</li>
+    </ul>
+    <p>
+      Vous pouvez contester une décision de modération par email à <a href="mailto:moderation@aupa-ab.com">moderation@aupa-ab.com</a> sous 30 jours. Une décision humaine sera rendue sous 7 jours ouvrés.
+    </p>
+    <p>
+      Un commentaire signalé par 3 utilisateurs distincts est automatiquement masqué le temps d'une revue.
     </p>
 
-    <h2>7. Loi applicable</h2>
+    <h2>7. Propriété intellectuelle</h2>
     <p>
-      Les présentes CGU sont régies par le droit français. Tout litige sera soumis aux tribunaux compétents de [ville].
+      Les actualités agrégées appartiennent à leurs éditeurs respectifs (cf. <a href="/mentions-legales">mentions légales § Propriété intellectuelle</a>). Toute reproduction au-delà des extraits courts publiés sur AUPA AB doit faire l'objet d'un accord direct avec l'éditeur d'origine.
+    </p>
+    <p>
+      Le design, le code et les contenus originaux d'AUPA AB sont soumis aux droits d'auteur. Toute reproduction non autorisée est interdite.
+    </p>
+
+    <h2>8. Données personnelles</h2>
+    <p>
+      Le traitement des données personnelles est détaillé dans notre <a href="/confidentialite">politique de confidentialité</a>. En résumé : aucune donnée n'est revendue, le site fonctionne sans cookies tiers en V1, et tous les droits RGPD (accès, rectification, effacement, portabilité, opposition) sont accessibles depuis votre compte ou par email à <a href="mailto:dpo@aupa-ab.com">dpo@aupa-ab.com</a>.
+    </p>
+
+    <h2>9. Évolution des CGU</h2>
+    <p>
+      AUPA AB peut modifier les CGU à tout moment. Les utilisateurs disposant d'un compte seront informés par email au moins 15 jours avant l'entrée en vigueur. La date de mise à jour figure en tête du document.
+    </p>
+
+    <h2>10. Droit applicable et juridiction</h2>
+    <p>
+      Les présentes CGU sont régies par le <strong>droit français</strong>. Tout litige qui n'aurait pu être résolu à l'amiable sera soumis aux <strong>tribunaux compétents de Bayonne</strong>, sous réserve de l'application impérative d'une autre juridiction (notamment pour les consommateurs).
+    </p>
+    <p>
+      <em>Vous pouvez également recourir à la médiation de la consommation auprès du Médiateur du e-commerce de la FEVAD :</em> <a href="https://www.mediateurfevad.fr" target="_blank" rel="noopener noreferrer">mediateurfevad.fr</a> <em>(décret n° 2015-1382).</em>
     </p>
   </Prose>
 </SiteShell>

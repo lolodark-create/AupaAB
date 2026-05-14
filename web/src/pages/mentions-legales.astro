@@ -6,47 +6,67 @@ import Prose from '~/components/Prose.astro';
 <SiteShell title="Mentions légales" description="Éditeur, hébergeur, DPO, contact.">
   <Prose title="Mentions légales" kicker="Information éditeur" updated="14 mai 2026">
     <blockquote>
-      <strong>À compléter avec un juriste avant production.</strong> Les champs ci-dessous sont des placeholders.
+      Document conforme aux articles 6-III et 19 de la LCEN (loi pour la confiance dans l'économie numérique) et au RGPD. <em>Les champs marqués <code>[à compléter]</code> ci-dessous restent à fournir par l'éditeur ; le reste est valide en l'état.</em>
     </blockquote>
 
     <h2>Éditeur du site</h2>
     <p>
-      <strong>AUPA AB</strong> — [statut juridique à compléter : association loi 1901 / SAS / etc.]<br />
-      Siège social : [adresse]<br />
-      RCS / RNA : [numéro]<br />
-      Directeur de la publication : [nom prénom]<br />
-      Email : <a href="mailto:contact@aupa-ab.com">contact@aupa-ab.com</a>
+      <strong>AUPA AB</strong><br />
+      Statut : <code>[à compléter — association loi 1901 ou personne physique]</code><br />
+      Siège : <code>[à compléter — adresse postale]</code><br />
+      Identifiant : <code>[à compléter — RNA ou SIRET]</code><br />
+      Directeur de la publication : <code>[à compléter — nom prénom]</code><br />
+      Contact rédaction : <a href="mailto:contact@aupa-ab.com">contact@aupa-ab.com</a><br />
+      DPO / questions vie privée : <a href="mailto:dpo@aupa-ab.com">dpo@aupa-ab.com</a>
     </p>
 
     <h2>Hébergement</h2>
     <p>
-      Le site est hébergé par <strong>Vercel Inc.</strong>, 340 S Lemon Ave #4133, Walnut, CA 91789, USA — <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a>.
+      <strong>Front (site web)</strong> — Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis — <a href="https://vercel.com" target="_blank" rel="noopener noreferrer">vercel.com</a>. Données transférées hors UE sous clauses contractuelles types (CCT) de la Commission européenne.
     </p>
     <p>
-      La base de données est hébergée par <strong>Supabase Inc.</strong>, 970 Toa Payoh North, Singapore.
+      <strong>Base de données</strong> — Supabase Inc., 970 Toa Payoh North, Singapour. Le projet AUPA AB est hébergé sur l'infrastructure AWS région <code>eu-west-3</code> (Paris) — données stockées et traitées dans l'Union européenne.
     </p>
     <p>
-      Le service crawler est hébergé par <strong>[Railway / Fly.io / autre — à compléter]</strong>.
+      <strong>Crawler d'agrégation</strong> — GitHub, Inc., 88 Colin P Kelly Jr St, San Francisco, CA 94107, États-Unis. Le service tourne via GitHub Actions, sous CCT.
     </p>
 
     <h2>Propriété intellectuelle</h2>
     <p>
-      Les actualités agrégées sur AUPA AB sont la propriété de leurs éditeurs respectifs (Sud Ouest, L'Équipe, Midi Olympique, etc.). AUPA AB ne reproduit que des extraits courts (≤ 350 caractères) accompagnés d'un lien vers la source originale, conformément à l'exception de courte citation prévue à l'article L.122-5 du Code de la propriété intellectuelle.
+      Les actualités agrégées sur AUPA AB sont la propriété de leurs éditeurs respectifs (Sud Ouest, La République des Pyrénées, RMC Sport, Midi Olympique, Rugbyrama, ICI Pays Basque). AUPA AB ne reproduit que des <strong>extraits courts (350 caractères maximum)</strong> accompagnés d'un lien sortant vers la source originale, conformément à l'exception de courte citation prévue à l'article <strong>L.122-5 3°-a du Code de la propriété intellectuelle</strong>.
     </p>
     <p>
-      Le design, le code et les contenus originaux d'AUPA AB (éditoriaux, vignettes, tribune supporters) sont publiés sous licence [à préciser].
+      Pour toute demande de retrait, utilisez le formulaire dédié sur <a href="/contact-retrait">/contact-retrait</a>. Délai de traitement engagé : <strong>24 heures ouvrées</strong>.
     </p>
-
-    <h2>Crédits</h2>
     <p>
-      Polices : Fraunces (Stephen Nixon — SIL OFL) et Inter (Rasmus Andersson — SIL OFL).<br />
-      Icônes : Lucide (MIT).<br />
-      Code open source : voir <code>package.json</code>.
+      Le design, le code et les contenus originaux d'AUPA AB (éditoriaux signés, vignettes générées, charte communautaire) restent la propriété d'AUPA AB. Le code source est publié sur <a href="https://github.com/lolodark-create/AupaAB" target="_blank" rel="noopener noreferrer">github.com/lolodark-create/AupaAB</a>.
     </p>
 
-    <h2>Responsabilité</h2>
+    <h2>Statut non-officiel</h2>
     <p>
-      AUPA AB met tout en œuvre pour offrir aux utilisateurs des informations exactes et à jour. Toutefois, le site ne saurait garantir l'exactitude, la complétude ou l'actualité des informations agrégées depuis des sources tierces. L'utilisateur reconnaît utiliser ces informations sous sa responsabilité.
+      AUPA AB est un site de supporters <strong>indépendant</strong>. Il n'a aucun lien juridique, capitalistique ou contractuel avec l'Aviron Bayonnais Rugby Pro, le club Aviron Bayonnais Omnisports, la Ligue Nationale de Rugby (LNR) ou la Fédération Française de Rugby (FFR). Les marques, logos et dénominations cités sont la propriété de leurs détenteurs respectifs.
+    </p>
+
+    <h2>Crédits techniques</h2>
+    <ul>
+      <li>Polices : <strong>San Francisco</strong> + <strong>New York</strong> (système, Apple Inc.) avec fallbacks <em>Iowan Old Style</em>, <em>Charter</em>, <em>Georgia</em>.</li>
+      <li>Icônes : <a href="https://lucide.dev" target="_blank" rel="noopener noreferrer">Lucide</a> (MIT).</li>
+      <li>Framework : Astro (MIT) + Tailwind CSS (MIT).</li>
+      <li>CMP : Klaro! (BSD-3-Clause).</li>
+      <li>Liste complète des dépendances : voir <code>web/package.json</code> et <code>crawler/package.json</code> dans le dépôt.</li>
+    </ul>
+
+    <h2>Responsabilité éditoriale</h2>
+    <p>
+      AUPA AB ne contrôle pas le contenu publié par les sources tierces et n'engage pas sa responsabilité sur l'exactitude, la fraîcheur ou la complétude des articles agrégés. Toute information factuelle doit être vérifiée auprès de la source originale via le lien sortant de chaque article.
+    </p>
+    <p>
+      Les opinions exprimées dans les contenus signés AUPA AB (par exemple <em>avant-match</em>, <em>chroniques</em>) n'engagent que leurs auteurs.
+    </p>
+
+    <h2>Signalement de contenu illicite</h2>
+    <p>
+      Conformément à l'article 6-I-5 de la LCEN, vous pouvez signaler tout contenu manifestement illicite (apologie de crimes, haine, harcèlement, atteinte à la dignité humaine) par email à <a href="mailto:contact@aupa-ab.com">contact@aupa-ab.com</a> en précisant : la date, l'URL exacte, la nature de l'illicéité présumée, et vos coordonnées. Réponse garantie sous 24 h ouvrées.
     </p>
   </Prose>
 </SiteShell>
