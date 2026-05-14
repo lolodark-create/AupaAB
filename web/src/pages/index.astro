@@ -10,7 +10,7 @@
 import SiteShell from '~/layouts/SiteShell.astro';
 import ArticleCard from '~/components/ArticleCard.astro';
 import Button from '~/components/atoms/Button.astro';
-import { listArticles, listActiveSources } from '~/lib/data';
+import { listArticles, listSourcesWithArticles } from '~/lib/data';
 import type { ArticleCategory } from '@shared/types';
 
 const url = Astro.url;
@@ -33,7 +33,7 @@ const articles = await listArticles({
   limit: 50,
 });
 
-const sourceList = await listActiveSources();
+const sourceList = await listSourcesWithArticles();
 
 // Build href preserving the OTHER filter
 const filterHref = (catKey: ArticleCategory | 'all') => {
@@ -94,7 +94,7 @@ const filterHref = (catKey: ArticleCategory | 'all') => {
           >
             <option value="all">Toutes les sources</option>
             {sourceList.map((s) => (
-              <option value={s.slug} selected={src === s.slug}>{s.name}</option>
+              <option value={s.slug} selected={src === s.slug}>{s.name} ({s.count})</option>
             ))}
           </select>
         </label>

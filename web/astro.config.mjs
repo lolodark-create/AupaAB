@@ -23,10 +23,15 @@ export default defineConfig({
   integrations: [
     tailwind({ applyBaseStyles: false }),
     sitemap({
+      // /actu became a 301-redirect to / after the home/actu merge; keeping
+      // it in the sitemap would advertise a redirect URL to crawlers.
+      // /recherche is noindex/nofollow (search results are user-specific).
       filter: (page) =>
         !page.includes('/admin') &&
         !page.includes('/api/') &&
-        !page.includes('/mon-compte'),
+        !page.includes('/mon-compte') &&
+        !page.match(/\/actu\/?$/) &&
+        !page.includes('/recherche'),
     }),
   ],
   server: { port: 4321, host: true },

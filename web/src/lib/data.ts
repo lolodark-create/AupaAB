@@ -244,3 +244,40 @@ export async function listActiveSources(): Promise<
     .order('name');
   return data ?? [];
 }
+
+// Sources that have at least one article visible to readers. Used by the
+// filter dropdown so we don't offer "RMC (0)" / "Rugbyrama (0)" choices
+// that lead to an empty list — La Rép, RMC, Rugbyrama are active in the
+// crawler but their RSS rarely surfaces AB-specific stories.
+export async function listSourcesWithArticles(): Promise<
+  Array<{ slug: string; name: string; count: number }>
+> {
+  if (!isConfigured()) {
+    const counts = new Map<string, number>();
+    for (const a of MOCK_ARTICLES) counts.set(a.source.slug, (counts.get(a.source.slug) ?? 0) + 1);
+    return Object.values(MOCK_SOURCES)
+      .filter((s) => (counts.get(s.slug) ?? 0) > 0)
+      .map((s) => ({ slug: s.slug, name: s.name, count: counts.get(s.slug) ?? 0 }));
+  }
+  const sb = anon();
+  // Count via the public view so RLS still gates which rows are counted.
+  // PostgREST doesn't expose `count(*) group by` directly so we fetch the
+  // source_id list and tally client-side. Cheap at V1 scale (≤50 articles).
+  const { data } = await sb
+    .from('articles_public')
+    .select('sources(slug, name)')
+    .order('published_at', { ascending: false })
+    .limit(500);
+  if (!data) return [];
+  const counts = new Map<string, { name: string; count: number }>();
+  for (const row of data) {
+    const s = Array.isArray(row.sources) ? row.sources[0] : (row.sources as { slug: string; name: string } | null);
+    if (!s) continue;
+    const existing = counts.get(s.slug);
+    if (existing) existing.count++;
+    else counts.set(s.slug, { name: s.name, count: 1 });
+  }
+  return [...counts.entries()]
+    .map(([slug, v]) => ({ slug, name: v.name, count: v.count }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
