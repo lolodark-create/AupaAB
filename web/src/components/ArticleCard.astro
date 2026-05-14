@@ -42,13 +42,15 @@ const {
 const href = `/article/${slug}`;
 const meta = getSourceMeta(sourceSlug);
 
+// `autre` used to read "À la une" — left over from when the nav had a hero
+// section by that name. Now it's just a neutral newsflash label.
 const categoryLabel: Record<ArticleCategory, string> = {
   match: 'Match',
   mercato: 'Mercato',
   coulisses: 'Coulisses',
   espoirs: 'Espoirs',
   pays_basque: 'Pays Basque',
-  autre: 'À la une',
+  autre: 'Brève',
 };
 ---
 
