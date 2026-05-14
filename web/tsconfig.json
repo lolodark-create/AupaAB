@@ -1,0 +1,15 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist", "node_modules", "public", ".vercel"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["src/*"],
+      "@shared/*": ["src/shared/*"]
+    },
+    "jsx": "preserve",
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": false
+  }
+}

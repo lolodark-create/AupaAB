@@ -1,0 +1,91 @@
+---
+import SiteShell from '~/layouts/SiteShell.astro';
+import ArticleCard from '~/components/ArticleCard.astro';
+import Icon from '~/components/atoms/Icon.astro';
+import Lauburu from '~/components/atoms/Lauburu.astro';
+import { searchArticles } from '~/lib/data';
+import { POPULAR_SEARCHES } from '@shared/mock';
+
+const url = Astro.url;
+const q = (url.searchParams.get('q') ?? '').trim();
+const results = q ? await searchArticles(q) : [];
+---
+
+<SiteShell
+  title={q ? `Recherche : ${q}` : 'Recherche'}
+  description="Recherchez dans les articles agrégés sur l'Aviron Bayonnais."
+  noindex={q.length > 0}
+>
+  <div class="max-w-reading mx-auto px-4 md:px-6 pt-12 md:pt-20 pb-16">
+    {!q && (
+      <div class="text-center mb-10">
+        <Lauburu size={48} stroke="rgb(var(--c-aviron))" />
+        <h1 class="mt-5 mb-2 font-serif font-semibold text-[28px] md:text-[34px] leading-tight" style="font-variation-settings:'opsz' 72;">
+          Recherchez dans l'actualité<br class="hidden md:inline" /> Aviron Bayonnais
+        </h1>
+        <p class="m-0 text-fg-secondary text-[15px]">3 247 articles indexés · mise à jour toutes les 15 min</p>
+      </div>
+    )}
+
+    <form method="get" role="search" class="relative">
+      <label class="sr-only" for="q-input">Recherche</label>
+      <Icon name="search" size={18} class="absolute left-4 top-1/2 -translate-y-1/2 text-fg-tertiary pointer-events-none" />
+      <input
+        id="q-input"
+        name="q"
+        type="search"
+        value={q}
+        placeholder="Spedding, mercato, Toulouse…"
+        autofocus
+        class="w-full pl-12 pr-4 py-3.5 text-[17px] font-sans bg-bg-elevated border border-border-default rounded-md text-fg placeholder:text-fg-tertiary focus:outline-none focus:border-aviron focus:ring-2 focus:ring-aviron/30"
+      />
+    </form>
+
+    {!q && (
+      <div class="mt-8">
+        <h2 class="t-meta mb-3">Recherches populaires</h2>
+        <div class="flex flex-wrap gap-2">
+          {POPULAR_SEARCHES.map((s) => (
+            <a
+              href={`/recherche?q=${encodeURIComponent(s)}`}
+              class="px-3 py-1.5 bg-bg-elevated border border-border-subtle rounded-full text-[13px] font-medium text-fg hover:bg-bg-subtle"
+            >{s}</a>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {q && results.length === 0 && (
+      <div class="mt-10 text-center py-10">
+        <Lauburu size={48} stroke="rgb(var(--fg-tertiary))" opacity={0.5} />
+        <h2 class="mt-4 mb-2 font-serif font-semibold text-[19px]">
+          Aucun article ne correspond à « {q} »
+        </h2>
+        <p class="m-0 text-[14px] text-fg-secondary">
+          Essayez avec moins de mots, ou voyez les <a href="/actu" class="text-aviron underline">dernières actualités</a>.
+        </p>
+      </div>
+    )}
+
+    {q && results.length > 0 && (
+      <div class="mt-6">
+        <p class="t-meta mb-2">{results.length} résultat{results.length > 1 ? 's' : ''}</p>
+        {results.map((a) => (
+          <ArticleCard
+            variant="row"
+            slug={a.slug}
+            title={a.title}
+            lede={a.lede ?? a.excerpt}
+            category={a.category}
+            sourceSlug={a.source.slug}
+            sourceName={a.source.name}
+            timeLabel={a.time_label}
+            dateLabel={a.date_label}
+            readingMin={a.reading_min}
+            commentCount={a.comment_count}
+          />
+        ))}
+      </div>
+    )}
+  </div>
+</SiteShell>

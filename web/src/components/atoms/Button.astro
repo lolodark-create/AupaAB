@@ -1,0 +1,95 @@
+---
+// Button — brief §8.1. Polymorphic <button> | <a>.
+import Icon from './Icon.astro';
+import type { IconName } from './icon-types';
+
+type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'dark';
+type Size = 'sm' | 'md' | 'lg';
+
+interface Props {
+  variant?: Variant;
+  size?: Size;
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  fullWidth?: boolean;
+  disabled?: boolean;
+  icon?: IconName;
+  iconRight?: IconName;
+  rel?: string;
+  target?: string;
+  'aria-label'?: string;
+  class?: string;
+}
+
+const {
+  variant = 'primary',
+  size = 'md',
+  href,
+  type = 'button',
+  fullWidth = false,
+  disabled = false,
+  icon,
+  iconRight,
+  rel,
+  target,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const base =
+  'inline-flex items-center justify-center gap-2 font-sans font-medium rounded-md whitespace-nowrap transition-colors duration-100 disabled:opacity-50 disabled:cursor-not-allowed';
+
+const variants: Record<Variant, string> = {
+  // text-white passes WCAG AA on light aviron (#006B9D); in dark, aviron is bright
+  // (#3FB0E5) so white only hits 2.95:1 — swap to text-night for AA there.
+  primary: 'bg-aviron text-white dark:text-night border border-aviron hover:bg-aviron-press hover:border-aviron-press',
+  secondary: 'bg-bg-elevated text-fg border border-border-default hover:bg-bg-subtle',
+  ghost: 'bg-transparent text-aviron border border-transparent hover:bg-bg-subtle',
+  danger: 'bg-ikurrina text-white border border-ikurrina hover:opacity-90',
+  dark: 'bg-night text-white border border-night hover:opacity-90',
+};
+
+const sizes: Record<Size, string> = {
+  sm: 'h-8 px-3 text-sm',
+  md: 'h-10 px-4 text-[15px]',
+  lg: 'h-12 px-6 text-[17px]',
+};
+
+const iconSize = size === 'sm' ? 14 : 16;
+
+const classes = [
+  base,
+  variants[variant],
+  sizes[size],
+  fullWidth && 'w-full',
+  className,
+].filter(Boolean).join(' ');
+---
+
+{
+  href ? (
+    <a
+      href={disabled ? undefined : href}
+      class={classes}
+      rel={rel}
+      target={target}
+      aria-disabled={disabled || undefined}
+      aria-label={rest['aria-label']}
+    >
+      {icon && <Icon name={icon} size={iconSize} aria-hidden="true" />}
+      <slot />
+      {iconRight && <Icon name={iconRight} size={iconSize} aria-hidden="true" />}
+    </a>
+  ) : (
+    <button
+      type={type}
+      class={classes}
+      disabled={disabled}
+      aria-label={rest['aria-label']}
+    >
+      {icon && <Icon name={icon} size={iconSize} aria-hidden="true" />}
+      <slot />
+      {iconRight && <Icon name={iconRight} size={iconSize} aria-hidden="true" />}
+    </button>
+  )
+}

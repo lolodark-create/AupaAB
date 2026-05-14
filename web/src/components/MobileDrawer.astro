@@ -1,0 +1,92 @@
+---
+import Logo from './Logo.astro';
+import Icon from './atoms/Icon.astro';
+
+const navItems = [
+  { href: '/', label: 'À la une', icon: 'home' as const },
+  { href: '/actu', label: 'Toutes les actualités', icon: 'newspaper' as const },
+  { href: '/actu?cat=match', label: 'Match', icon: 'calendar' as const },
+  { href: '/actu?cat=mercato', label: 'Mercato', icon: 'arrowRight' as const },
+  { href: '/sources', label: 'Sources', icon: 'users' as const },
+];
+---
+
+<div
+  id="mobile-drawer"
+  class="fixed inset-0 z-[80] pointer-events-none md:hidden"
+  aria-hidden="true"
+  inert
+>
+  <div
+    id="drawer-backdrop"
+    class="absolute inset-0 bg-night/50 opacity-0 transition-opacity duration-200 backdrop-blur-sm"
+  ></div>
+  <aside
+    id="drawer-panel"
+    class="absolute top-0 right-0 bottom-0 w-[88%] max-w-[360px] bg-bg-default border-l border-border-subtle flex flex-col translate-x-full transition-transform duration-[250ms] ease-out"
+    aria-label="Menu mobile"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="h-14 px-4 flex items-center justify-between border-b border-border-subtle">
+      <Logo variant="mark" size={32} />
+      <button id="drawer-close" class="p-2 text-fg" aria-label="Fermer le menu">
+        <Icon name="x" size={22} />
+      </button>
+    </div>
+    <nav class="p-3 flex-1 flex flex-col" aria-label="Navigation mobile">
+      {navItems.map((n) => (
+        <a
+          href={n.href}
+          class="flex items-center gap-3.5 px-4 py-3.5 text-base font-medium text-fg rounded-md hover:bg-bg-subtle"
+        >
+          <Icon name={n.icon} size={20} aria-hidden="true" />
+          {n.label}
+        </a>
+      ))}
+      <span class="flex-1" />
+      <div class="p-4 border-t border-border-subtle mt-4 space-y-2">
+        <p class="text-[11px] text-fg-tertiary text-center leading-relaxed">
+          Site non-officiel. Pas affilié à l'Aviron Bayonnais. Faits par des supporters, sur leur temps libre, avec amour.
+        </p>
+      </div>
+    </nav>
+  </aside>
+</div>
+
+<script is:inline>
+  (function () {
+    const drawer = document.getElementById('mobile-drawer');
+    const panel = document.getElementById('drawer-panel');
+    const backdrop = document.getElementById('drawer-backdrop');
+    const openBtn = document.getElementById('drawer-open');
+    const closeBtn = document.getElementById('drawer-close');
+    if (!drawer || !panel || !backdrop) return;
+
+    function open() {
+      drawer.style.pointerEvents = 'auto';
+      drawer.setAttribute('aria-hidden', 'false');
+      drawer.removeAttribute('inert');
+      backdrop.style.opacity = '1';
+      panel.style.transform = 'translateX(0)';
+      openBtn?.setAttribute('aria-expanded', 'true');
+      const first = panel.querySelector('a, button');
+      if (first instanceof HTMLElement) first.focus();
+    }
+    function close() {
+      drawer.style.pointerEvents = 'none';
+      drawer.setAttribute('aria-hidden', 'true');
+      drawer.setAttribute('inert', '');
+      backdrop.style.opacity = '0';
+      panel.style.transform = 'translateX(100%)';
+      openBtn?.setAttribute('aria-expanded', 'false');
+      openBtn?.focus();
+    }
+    openBtn?.addEventListener('click', open);
+    closeBtn?.addEventListener('click', close);
+    backdrop.addEventListener('click', close);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && drawer.getAttribute('aria-hidden') === 'false') close();
+    });
+  })();
+</script>

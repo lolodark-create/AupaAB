@@ -1,0 +1,43 @@
+# Supabase local config (V1 minimum).
+# Adapt project_id when linking to a real cloud project: `supabase link --project-ref ...`.
+project_id = "aupa-ab"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://127.0.0.1:54321"
+
+[inbucket]
+enabled = true
+port = 54324
+
+[auth]
+enabled = true
+site_url = "http://localhost:4321"
+additional_redirect_urls = ["https://aupa-ab.com"]
+jwt_expiry = 3600
+enable_signup = false  # V1 reads only; flip to true at V1.5
+
+[auth.email]
+enable_signup = false
+double_confirm_changes = true
+enable_confirmations = true
+
+[auth.external.google]
+enabled = false  # enable at V1.5
+
+[storage]
+enabled = true
+file_size_limit = "10MiB"

@@ -1,0 +1,52 @@
+---
+import SiteShell from '~/layouts/SiteShell.astro';
+import Prose from '~/components/Prose.astro';
+---
+
+<SiteShell title="Mentions légales" description="Éditeur, hébergeur, DPO, contact.">
+  <Prose title="Mentions légales" kicker="Information éditeur" updated="14 mai 2026">
+    <blockquote>
+      <strong>À compléter avec un juriste avant production.</strong> Les champs ci-dessous sont des placeholders.
+    </blockquote>
+
+    <h2>Éditeur du site</h2>
+    <p>
+      <strong>AUPA AB</strong> — [statut juridique à compléter : association loi 1901 / SAS / etc.]<br />
+      Siège social : [adresse]<br />
+      RCS / RNA : [numéro]<br />
+      Directeur de la publication : [nom prénom]<br />
+      Email : <a href="mailto:contact@aupa-ab.com">contact@aupa-ab.com</a>
+    </p>
+
+    <h2>Hébergement</h2>
+    <p>
+      Le site est hébergé par <strong>Vercel Inc.</strong>, 340 S Lemon Ave #4133, Walnut, CA 91789, USA — <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a>.
+    </p>
+    <p>
+      La base de données est hébergée par <strong>Supabase Inc.</strong>, 970 Toa Payoh North, Singapore.
+    </p>
+    <p>
+      Le service crawler est hébergé par <strong>[Railway / Fly.io / autre — à compléter]</strong>.
+    </p>
+
+    <h2>Propriété intellectuelle</h2>
+    <p>
+      Les actualités agrégées sur AUPA AB sont la propriété de leurs éditeurs respectifs (Sud Ouest, L'Équipe, Midi Olympique, etc.). AUPA AB ne reproduit que des extraits courts (≤ 350 caractères) accompagnés d'un lien vers la source originale, conformément à l'exception de courte citation prévue à l'article L.122-5 du Code de la propriété intellectuelle.
+    </p>
+    <p>
+      Le design, le code et les contenus originaux d'AUPA AB (éditoriaux, vignettes, tribune supporters) sont publiés sous licence [à préciser].
+    </p>
+
+    <h2>Crédits</h2>
+    <p>
+      Polices : Fraunces (Stephen Nixon — SIL OFL) et Inter (Rasmus Andersson — SIL OFL).<br />
+      Icônes : Lucide (MIT).<br />
+      Code open source : voir <code>package.json</code>.
+    </p>
+
+    <h2>Responsabilité</h2>
+    <p>
+      AUPA AB met tout en œuvre pour offrir aux utilisateurs des informations exactes et à jour. Toutefois, le site ne saurait garantir l'exactitude, la complétude ou l'actualité des informations agrégées depuis des sources tierces. L'utilisateur reconnaît utiliser ces informations sous sa responsabilité.
+    </p>
+  </Prose>
+</SiteShell>

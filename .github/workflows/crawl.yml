@@ -1,0 +1,49 @@
+name: Crawl RSS sources
+
+# Production crawl scheduling.
+# Runs ingest-once.mjs every 15 min from a GitHub-hosted runner. This avoids
+# needing Railway/Fly: the crawl connects directly to Supabase Postgres via the
+# `DATABASE_URL` secret (transaction pooler IPv4) and inserts new articles.
+#
+# Required repository secret:
+#   DATABASE_URL = postgresql://postgres.<ref>:<pwd>@aws-0-<region>.pooler.supabase.com:5432/postgres
+#
+# Manual trigger:
+#   gh workflow run crawl.yml --repo lolodark-create/AupaAB
+#   …or click "Run workflow" in the Actions tab.
+
+on:
+  schedule:
+    # GitHub Actions cron is UTC. Every 15 min between 06:00-22:00 UTC = 7h-23h
+    # Paris (CEST). Off-hours every 30 min to keep usage minutes low.
+    - cron: '*/15 6-22 * * *'
+    - cron: '*/30 22,23,0,1,2,3,4,5 * * *'
+  workflow_dispatch: {}
+
+# Cancel earlier runs of the same workflow if a new one starts.
+concurrency:
+  group: crawl-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: crawler/package-lock.json
+
+      - name: Install crawler deps
+        run: npm ci --prefix crawler
+
+      - name: Run one-shot ingestion
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: node crawler/scripts/ingest-once.mjs

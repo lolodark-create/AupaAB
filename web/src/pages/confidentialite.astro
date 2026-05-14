@@ -1,0 +1,69 @@
+---
+import SiteShell from '~/layouts/SiteShell.astro';
+import Prose from '~/components/Prose.astro';
+---
+
+<SiteShell title="Politique de confidentialité" description="Comment nous traitons vos données, vos droits RGPD.">
+  <Prose title="Politique de confidentialité" kicker="RGPD" updated="14 mai 2026">
+    <blockquote>
+      <strong>À faire relire par un juriste avant production.</strong>
+    </blockquote>
+
+    <h2>Responsable du traitement</h2>
+    <p>
+      [À compléter — voir mentions légales]
+    </p>
+
+    <h2>Délégué à la protection des données (DPO)</h2>
+    <p>
+      <a href="mailto:dpo@aupa-ab.com">dpo@aupa-ab.com</a>
+    </p>
+
+    <h2>Données collectées en V1 (sans compte)</h2>
+    <ul>
+      <li><strong>Analytics anonymisées via Plausible</strong> : pas de cookie, pas d'identifiant, anonymisation IP au niveau du serveur. Conforme RGPD sans consentement strict.</li>
+      <li><strong>Logs serveur techniques</strong> : adresse IP, user-agent, route consultée. Conservés 30 jours pour détection d'abus, puis supprimés.</li>
+    </ul>
+
+    <h2>Données collectées en V1.5 (avec compte)</h2>
+    <ul>
+      <li>Email (obligatoire pour la création de compte)</li>
+      <li>Pseudo (obligatoire)</li>
+      <li>Nom affiché, bio, année supporter, joueur préféré (facultatif)</li>
+      <li>Articles sauvegardés (privés)</li>
+      <li>Préférences de notification</li>
+    </ul>
+
+    <h2>Cookies</h2>
+    <p>
+      Voir notre <a href="/cookies">page cookies dédiée</a>.
+    </p>
+
+    <h2>Vos droits</h2>
+    <ul>
+      <li><strong>Accès</strong> : vous pouvez demander un export complet de vos données (JSON) via <code>/api/auth/export-data</code> une fois connecté (V1.5+).</li>
+      <li><strong>Rectification</strong> : page <code>/mon-compte</code>.</li>
+      <li><strong>Effacement</strong> : bouton "Supprimer mon compte" qui cascade tous les contenus rattachés. Les commentaires publics sont anonymisés (auteur → "[supprimé]").</li>
+      <li><strong>Portabilité</strong> : l'export JSON est portable.</li>
+      <li><strong>Opposition</strong> : toggle dans <code>/mon-compte/notifications</code>.</li>
+      <li><strong>Réclamation</strong> : auprès de la CNIL, <a href="https://www.cnil.fr" target="_blank" rel="noopener">cnil.fr</a>.</li>
+    </ul>
+
+    <h2>Sous-traitants</h2>
+    <ul>
+      <li>Hébergement front : Vercel (USA, clauses contractuelles types).</li>
+      <li>Base de données : Supabase (Singapour, idem).</li>
+      <li>Email transactionnel : Resend (USA, idem).</li>
+      <li>Analytics : Plausible (Europe).</li>
+      <li>Modération IA : Anthropic (USA — données envoyées : contenu du commentaire uniquement, pas d'identité).</li>
+    </ul>
+
+    <h2>Durée de conservation</h2>
+    <ul>
+      <li>Compte actif : tant que le compte est actif.</li>
+      <li>Compte inactif > 24 mois : email d'avertissement puis suppression.</li>
+      <li>Logs serveur : 30 jours.</li>
+      <li>Logs de modération : 12 mois.</li>
+    </ul>
+  </Prose>
+</SiteShell>

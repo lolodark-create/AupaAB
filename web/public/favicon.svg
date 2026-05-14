@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="32" height="32">
+  <rect width="100" height="100" rx="18" fill="#0B2545"/>
+  <g stroke="#3FB0E5" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z"/>
+    <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="rotate(90 50 50)"/>
+    <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="rotate(180 50 50)"/>
+    <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="rotate(270 50 50)"/>
+  </g>
+</svg>

@@ -1,0 +1,48 @@
+---
+import SiteShell from '~/layouts/SiteShell.astro';
+import { listActiveSources } from '~/lib/data';
+import { getSourceMeta } from '~/lib/sources';
+
+const list = await listActiveSources();
+---
+
+<SiteShell
+  title="Sources surveillées"
+  description="La liste complète des médias dont nous agrégeons les flux RSS. Transparence totale : vous saurez toujours d'où vient une info."
+>
+  <div class="max-w-reading mx-auto px-4 md:px-6 pt-10 md:pt-16 pb-16">
+    <span class="t-meta text-aviron">Transparence</span>
+    <h1 class="mt-1 mb-4 font-serif font-semibold text-[34px] md:text-[44px] leading-[1.06]" style="font-variation-settings:'opsz' 96, 'SOFT' 40;">
+      Les médias qu'on lit pour vous
+    </h1>
+    <p class="text-[17px] leading-[1.6] text-fg-secondary mb-8">
+      AUPA AB ne produit pas d'actualités. On collecte, on filtre, on contextualise, on renvoie vers la source. Voici la liste de ce qu'on lit. Si vous éditez un de ces médias et souhaitez qu'on retire votre flux, <a href="/contact-retrait" class="text-aviron underline">écrivez-nous</a> : on le fera dans la journée.
+    </p>
+
+    <ul class="list-none m-0 p-0 border-t border-border-subtle">
+      {list.map((s) => {
+        const meta = getSourceMeta(s.slug);
+        return (
+        <li class="flex items-center gap-4 py-4 border-b border-border-subtle">
+          <span
+            class="inline-flex items-center justify-center w-10 h-10 rounded-md text-white font-bold text-sm shrink-0"
+            style={`background:${meta.color};`}
+            aria-hidden="true"
+          >{meta.mono}</span>
+          <div class="flex-1 min-w-0">
+            <a href={`https://${s.domain}`} target="_blank" rel="noopener noreferrer" class="font-medium text-fg hover:text-aviron">{s.name}</a>
+            <div class="text-[12.5px] text-fg-secondary">{s.domain}</div>
+          </div>
+          <span class="text-[12px] text-fg-tertiary shrink-0">
+            {s.last_fetched_at ? `Dernier scan ${new Date(s.last_fetched_at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}` : 'Jamais scanné'}
+          </span>
+        </li>
+      );
+      })}
+    </ul>
+
+    <div class="mt-10 p-5 rounded-lg bg-bg-subtle text-[13.5px] text-fg-secondary leading-relaxed">
+      <strong class="text-fg">Méthode</strong> — On lit uniquement les flux RSS publics. Aucun scraping. Le filtre AB se déclenche sur ~30 mots-clés (nom du club, joueurs, stade, identité basque). Tout article qui passe le filtre est inséré avec un extrait de 350 caractères maximum et un lien vers l'original.
+    </div>
+  </div>
+</SiteShell>

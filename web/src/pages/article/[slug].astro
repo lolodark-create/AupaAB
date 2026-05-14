@@ -1,0 +1,248 @@
+---
+import SiteShell from '~/layouts/SiteShell.astro';
+import ArticleCard from '~/components/ArticleCard.astro';
+import EditorialThumb from '~/components/EditorialThumb.astro';
+import Badge from '~/components/atoms/Badge.astro';
+import Button from '~/components/atoms/Button.astro';
+import SourceChip from '~/components/atoms/SourceChip.astro';
+import Avatar from '~/components/atoms/Avatar.astro';
+import Icon from '~/components/atoms/Icon.astro';
+import TrendingList from '~/components/TrendingList.astro';
+import { getArticle, listArticles } from '~/lib/data';
+import { getSourceMeta } from '~/lib/sources';
+import type { ArticleCategory } from '@shared/types';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+const article = slug ? await getArticle(slug) : null;
+
+if (!article) {
+  return new Response(null, { status: 404, statusText: 'Article not found' });
+}
+
+const meta = getSourceMeta(article.source.slug);
+
+const categoryLabel: Record<ArticleCategory, string> = {
+  match: 'Match',
+  mercato: 'Mercato',
+  coulisses: 'Coulisses',
+  espoirs: 'Espoirs',
+  pays_basque: 'Pays Basque',
+  autre: 'À la une',
+};
+
+const body = article.body ?? [
+  article.lede ?? '',
+  `Le contenu complet de cet article est disponible sur la source d'origine. AUPA AB reformule, contextualise et résume les actualités, mais ne reproduit pas l'intégralité du texte par respect du droit d'auteur. Cliquez sur le bouton ci-dessous pour lire l'article complet chez ${article.source.name}.`,
+];
+
+const allRelated = await listArticles({ limit: 6 });
+const related = allRelated.filter((a) => a.slug !== article.slug).slice(0, 3);
+---
+
+<SiteShell
+  title={article.title}
+  description={article.excerpt}
+  type="article"
+  publishedAt={article.published_at}
+  author={article.author ?? undefined}
+  category={categoryLabel[article.category]}
+  tags={article.tags}
+  sourceName={article.source.name}
+  sourceUrl={article.source_url}
+  ogImage={`${import.meta.env.PUBLIC_SITE_URL ?? ''}/og/${article.slug}.png`}
+>
+  {/* Breadcrumb strip */}
+  <div class="bg-bg-subtle border-b border-border-subtle">
+    <div class="max-w-container mx-auto px-4 md:px-8 py-3 flex items-center gap-3 flex-wrap text-[12.5px]">
+      <a href="/" class="inline-flex items-center gap-1.5 text-fg-secondary font-medium hover:text-fg">
+        <Icon name="arrowLeft" size={14} aria-hidden="true" /> Retour
+      </a>
+      <span class="text-fg-tertiary">/</span>
+      <a href="/actu" class="text-fg-secondary hover:text-fg">Actualités</a>
+      <span class="text-fg-tertiary">/</span>
+      <span class="text-fg font-medium">{categoryLabel[article.category]}</span>
+    </div>
+  </div>
+
+  <article class="max-w-container mx-auto px-4 md:px-8 py-7 md:py-14 grid md:grid-cols-[64px_minmax(0,680px)_1fr] gap-0 md:gap-12 justify-items-stretch md:justify-items-center md:justify-center">
+    {/* Floating share rail (desktop) */}
+    <div class="hidden md:flex sticky top-24 self-start flex-col gap-2.5 h-fit" aria-label="Actions article">
+      <a
+        href={article.source_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="w-11 h-11 inline-flex items-center justify-center rounded-md border border-border-subtle bg-bg-elevated text-fg hover:bg-bg-subtle"
+        aria-label="Lire chez la source"
+      >
+        <Icon name="external" size={18} />
+      </a>
+      <a
+        href={`/contact-retrait?url=${encodeURIComponent(article.source_url ?? '')}`}
+        class="w-11 h-11 inline-flex items-center justify-center rounded-md border border-border-subtle bg-bg-elevated text-fg hover:bg-bg-subtle"
+        aria-label="Demande de retrait"
+      >
+        <Icon name="flag" size={18} />
+      </a>
+      <div class="h-8 w-px bg-border-subtle self-center my-1"></div>
+      <span class="text-[10.5px] text-fg-tertiary tracking-[0.16em] uppercase font-medium text-center" style="writing-mode:vertical-rl; transform:rotate(180deg);">
+        {article.reading_min} min de lecture
+      </span>
+    </div>
+
+    {/* Main column */}
+    <div class="max-w-reading w-full">
+      {/* Meta strip */}
+      <div class="flex items-center gap-3 mb-6 flex-wrap">
+        <Badge variant="category">{categoryLabel[article.category]}</Badge>
+        <SourceChip name={article.source.name} mono={meta.mono} color={meta.color} />
+        <span class="text-[12.5px] text-fg-secondary">· {article.date_label}</span>
+      </div>
+
+      {/* Title */}
+      <h1
+        class="m-0 font-serif font-semibold text-[32px] md:text-[52px] leading-[1.04] tracking-[-0.015em] text-fg"
+        style="font-variation-settings:'opsz' 144, 'SOFT' 50; text-wrap:balance;"
+      >
+        {article.title}
+      </h1>
+
+      {/* Byline */}
+      <div class="flex items-center gap-3 my-7 pb-6 border-b border-border-subtle">
+        <Avatar displayName={article.author ?? 'A'} size={40} />
+        <div class="flex-1">
+          <div class="text-sm font-semibold">
+            {article.author ? `Par ${article.author}` : 'La rédaction'}
+          </div>
+          <div class="text-[12.5px] text-fg-secondary">
+            {article.reading_min} min de lecture · Publié {article.time_label}
+          </div>
+        </div>
+      </div>
+
+      {/* Editorial cover */}
+      <div class="rounded-lg overflow-hidden mb-8 aspect-video">
+        <EditorialThumb
+          id={article.slug}
+          title={article.title}
+          category={article.category}
+          dateLabel={article.date_label}
+          sourceSlug={article.source.slug}
+          sourceName={article.source.name}
+          size="lg"
+        />
+      </div>
+
+      {/* Lede */}
+      {article.lede && (
+        <p
+          class="font-serif font-normal text-[21px] md:text-[24px] leading-[1.45] tracking-[-0.003em] m-0 mb-7 text-fg"
+          style="font-variation-settings:'opsz' 36; text-wrap:pretty;"
+        >
+          {article.lede}
+        </p>
+      )}
+
+      {/* Body */}
+      <div class="prose-article flex flex-col gap-5 text-[17px] md:text-lg leading-[1.7] text-fg">
+        {body.map((p) => <p style="text-wrap:pretty;">{p}</p>)}
+      </div>
+
+      {/* Excerpt notice + CTA */}
+      <div class="mt-8 mb-7 p-5 rounded-lg bg-bg-subtle border-l-4 border-aviron">
+        <p class="m-0 text-[13.5px] text-fg-secondary leading-relaxed">
+          <strong class="text-fg">Pourquoi un extrait ?</strong> AUPA AB est un agrégateur non-officiel : on résume et on contextualise, mais on ne republie pas. Pour la version intégrale, suivez le lien vers la source.
+        </p>
+      </div>
+      <Button variant="primary" size="lg" fullWidth href={article.source_url} target="_blank" rel="noopener noreferrer" iconRight="external">
+        Lire l'article complet sur {article.source.name}
+      </Button>
+      <p class="m-0 mt-3 text-xs text-fg-tertiary text-center italic">
+        On vous redirige. Pas de pisteur, pas de pop-up. <em>Comme la vie devrait être.</em>
+      </p>
+
+      {/* Tags */}
+      <div class="mt-8 flex gap-2 flex-wrap">
+        {(article.tags ?? []).map((t) => (
+          <a
+            href={`/recherche?q=${encodeURIComponent(t)}`}
+            class="px-3 py-1.5 text-[12.5px] font-medium rounded-full bg-bg-subtle text-fg hover:bg-sand"
+          >#{t}</a>
+        ))}
+      </div>
+
+      {/* Action bar (no comments in V1; share + bookmark V1.5+) */}
+      <div class="mt-8 py-4 border-t border-b border-border-subtle flex gap-4 items-center">
+        <button
+          class="inline-flex items-center gap-2 text-[13.5px] font-medium text-fg cursor-not-allowed opacity-50"
+          aria-disabled="true"
+          title="Sauvegarde disponible en V1.5"
+        >
+          <Icon name="bookmark" size={16} /> Sauvegarder (bientôt)
+        </button>
+        <a
+          href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`${import.meta.env.PUBLIC_SITE_URL ?? ''}/article/${article.slug}`)}&text=${encodeURIComponent(article.title)}`}
+          target="_blank" rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 text-[13.5px] font-medium text-fg hover:text-aviron"
+        >
+          <Icon name="share" size={16} /> Partager
+        </a>
+        <a
+          href={`/contact-retrait?url=${encodeURIComponent(article.source_url ?? '')}`}
+          class="inline-flex items-center gap-2 text-[13.5px] font-medium text-fg hover:text-aviron"
+        >
+          <Icon name="flag" size={16} /> Signaler / retrait
+        </a>
+      </div>
+
+      {/* Related */}
+      <section class="mt-14">
+        <h2 class="mb-5 font-serif font-semibold text-[22px] tracking-[-0.005em]" style="font-variation-settings:'opsz' 60;">
+          À lire ensuite
+        </h2>
+        <div class="flex flex-col gap-1">
+          {related.map((a) => (
+            <ArticleCard
+              variant="compact"
+              slug={a.slug}
+              title={a.title}
+              category={a.category}
+              sourceSlug={a.source.slug}
+              sourceName={a.source.name}
+              timeLabel={a.time_label}
+              dateLabel={a.date_label}
+              readingMin={a.reading_min}
+              commentCount={a.comment_count}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Comments placeholder (V2) */}
+      <section class="mt-14">
+        <div class="p-6 rounded-lg bg-bg-subtle border border-border-subtle text-center">
+          <h2 class="m-0 font-serif font-semibold text-[19px]">Commentaires</h2>
+          <p class="mt-2 mb-0 text-sm text-fg-secondary">
+            Disponibles dans la V2 — avec modération automatique et threading.
+            <br />En attendant : <a href={article.source_url} target="_blank" rel="noopener noreferrer" class="text-aviron underline">discutez sous l'article original</a>.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    {/* Sidebar (desktop) */}
+    <div class="hidden md:flex sticky top-24 self-start flex-col gap-7 h-fit w-full max-w-[320px]" aria-label="Tendances et avis">
+      <div class="p-6 bg-bg-elevated border border-border-subtle rounded-lg">
+        <TrendingList />
+      </div>
+      <div class="p-6 bg-bg-subtle rounded-lg border border-dashed border-border-default">
+        <span class="t-meta">Avis de la maison</span>
+        <p class="mt-2.5 m-0 font-serif text-base leading-[1.4] italic" style="font-variation-settings:'opsz' 36;">
+          « Les commentaires ici se lisent comme on boit un café : vite, en regardant par la fenêtre, en se disant que la vie est belle. »
+        </p>
+        <p class="mt-3 m-0 text-[11.5px] text-fg-tertiary">— un abonné, 2025</p>
+      </div>
+    </div>
+  </article>
+</SiteShell>

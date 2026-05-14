@@ -1,0 +1,221 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =================================================================
+   AUPA AB — design tokens
+   Tailwind reads these as `rgb(var(--c-X) / <alpha-value>)`,
+   so values are stored as space-separated RGB triplets (no #, no rgb()).
+   Source: design brief §3.
+   ================================================================= */
+
+@layer base {
+  :root {
+    /* Brand (raw RGB).
+       --c-aviron: text and small UI. Brief's pure #0099D8 was 3.0:1 on white —
+       fails WCAG AA. Darkened to #006B9D (5.5:1 on white, 4.93:1 white-on-aviron).
+       --c-aviron-bg: keeps the brighter #0099D8 for large surfaces where text
+       contrast is not a concern (large titles only). */
+    --c-aviron: 0 107 157;
+    --c-aviron-bg: 0 153 216;
+    --c-aviron-press: 0 80 121;
+    --c-night: 11 37 69;
+    --c-off-white: 250 250 247;
+    --c-slate: 26 29 36;
+    --c-sand: 239 234 224;
+    --c-ikurrina: 213 43 30;
+    --c-basque: 47 143 79;
+
+    /* Surfaces — light */
+    --bg-default: 250 250 247;
+    --bg-elevated: 255 255 255;
+    --bg-subtle: 239 234 224;
+    --bg-tint: 241 236 223;
+
+    /* Text — light. Tertiary darkened to #5F6975 to clear 4.5:1 on bg-subtle
+       #EFEAE0 (used in footer + cards). Distinct from secondary #5A6472 by
+       intent: tertiary stays a notch lighter for hierarchy. */
+    --fg-primary: 26 29 36;
+    --fg-secondary: 90 100 114;
+    --fg-tertiary: 95 105 117;
+
+    /* Borders — light */
+    --border-subtle: 229 226 217;
+    --border-default: 207 202 184;
+
+    /* Semantic — light */
+    --c-success: 47 143 79;
+    --c-warning: 217 119 6;
+    --c-danger: 213 43 30;
+    --c-info: 0 153 216;
+
+    /* Typography */
+    --reading-max: 680px;
+    --container-max: 1280px;
+
+    color-scheme: light;
+  }
+
+  [data-theme='dark'] {
+    --c-aviron: 63 176 229;
+    --c-aviron-bg: 63 176 229;
+    --c-aviron-press: 101 191 234;
+    --c-night: 6 21 40;
+    --c-off-white: 14 17 22;
+    --c-slate: 230 230 225;
+    --c-sand: 28 33 41;
+    --c-ikurrina: 248 113 113;
+    --c-basque: 74 222 128;
+
+    --bg-default: 14 17 22;
+    --bg-elevated: 23 27 34;
+    --bg-subtle: 28 33 41;
+    --bg-tint: 22 26 33;
+
+    --fg-primary: 230 230 225;
+    --fg-secondary: 156 163 175;
+    /* Tertiary lifted #6B7280 → #878E9A so it passes WCAG AA on bg-subtle dark #1C2129. */
+    --fg-tertiary: 135 142 154;
+
+    --border-subtle: 37 42 51;
+    --border-default: 55 65 81;
+
+    --c-success: 74 222 128;
+    --c-warning: 251 191 36;
+    --c-danger: 248 113 113;
+    --c-info: 63 176 229;
+
+    color-scheme: dark;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background: rgb(var(--bg-default));
+    color: rgb(var(--fg-primary));
+    /* System sans-serif: San Francisco (Mac/iOS), Segoe UI (Windows), Roboto
+       (Android). Best native rendering, zero font download. */
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI',
+      system-ui, Roboto, 'Helvetica Neue', sans-serif;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-optical-sizing: auto;
+  }
+
+  /* Focus ring — brief §13 */
+  :focus-visible {
+    outline: 2px solid rgb(var(--c-aviron));
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Selection */
+  ::selection {
+    background: rgb(var(--c-aviron));
+    color: #fff;
+  }
+
+  /* Scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--border-default)) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: rgb(var(--border-default));
+    border-radius: 4px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Reduce motion — brief §11.1 */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Meta caption — brief §4.2 */
+  .t-meta {
+    font-weight: 500;
+    font-size: 0.7188rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: rgb(var(--fg-secondary));
+  }
+
+  /* Serif headings with optical sizing — brief §4.1 */
+  /* System serif: New York (macOS/iOS 13+) → Iowan Old Style → Charter → Georgia.
+     Optical sizing handled by browser via font-optical-sizing: auto on body. */
+  .t-display {
+    font-family: 'New York', 'Iowan Old Style', Charter, ui-serif, Georgia, serif;
+    font-weight: 700;
+    letter-spacing: -0.022em;
+    line-height: 1.04;
+  }
+  .t-h1 {
+    font-family: 'New York', 'Iowan Old Style', Charter, ui-serif, Georgia, serif;
+    font-weight: 700;
+    letter-spacing: -0.018em;
+    line-height: 1.08;
+  }
+  .t-h2 {
+    font-family: 'New York', 'Iowan Old Style', Charter, ui-serif, Georgia, serif;
+    font-weight: 600;
+    letter-spacing: -0.014em;
+    line-height: 1.15;
+  }
+  .t-h3 {
+    font-family: 'New York', 'Iowan Old Style', Charter, ui-serif, Georgia, serif;
+    font-weight: 600;
+    letter-spacing: -0.008em;
+    line-height: 1.25;
+  }
+
+  /* Article prose — reading width 680, brief §5.2 */
+  .prose-article {
+    max-width: var(--reading-max);
+    margin-inline: auto;
+  }
+  .prose-article > p {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    margin-block: 0;
+    text-wrap: pretty;
+  }
+  .prose-article > p + p {
+    margin-top: 1.375rem;
+  }
+
+  /* Tabular numerals */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+}

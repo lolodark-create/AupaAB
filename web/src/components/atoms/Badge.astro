@@ -1,0 +1,51 @@
+---
+// Badge / tag — brief §8.4.
+import Icon from './Icon.astro';
+import type { IconName } from './icon-types';
+
+type Variant = 'default' | 'category' | 'live' | 'success' | 'outline' | 'sponsored';
+type Size = 'sm' | 'md';
+
+interface Props {
+  variant?: Variant;
+  size?: Size;
+  icon?: IconName;
+  pulse?: boolean;
+  class?: string;
+}
+
+const { variant = 'default', size = 'md', icon, pulse = false, class: className } = Astro.props;
+
+const variants: Record<Variant, string> = {
+  default: 'bg-sand text-fg',
+  // Category badge: 10% tint of brand on the lighter aviron-bg, text uses
+  // the darker aviron-press so small uppercase clears WCAG AA (4.5:1).
+  category: 'bg-aviron-bg/15 text-aviron-press',
+  live: 'bg-ikurrina text-white',
+  success: 'bg-basque/15 text-success',
+  outline: 'bg-transparent text-fg border border-border-default',
+  sponsored: 'bg-bg-subtle text-fg-secondary border border-border-subtle',
+};
+
+const sizes: Record<Size, string> = {
+  sm: 'px-2 py-[2px] text-[10.5px]',
+  md: 'px-2.5 py-1 text-[11.5px]',
+};
+
+const iconSize = 12;
+
+const classes = [
+  'inline-flex items-center gap-1.5 font-semibold uppercase tracking-[0.06em] rounded-full whitespace-nowrap',
+  variants[variant],
+  sizes[size],
+  className,
+].filter(Boolean).join(' ');
+---
+
+<span class={classes}>
+  {pulse && (
+    <span class="block w-1.5 h-1.5 rounded-full bg-current animate-pulse-aupa" aria-hidden="true" />
+  )}
+  {icon && <Icon name={icon} size={iconSize} aria-hidden="true" />}
+  <slot />
+</span>

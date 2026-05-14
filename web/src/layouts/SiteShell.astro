@@ -1,0 +1,34 @@
+---
+// SiteShell — wraps a page with Header + MobileDrawer + Footer.
+// Pages that don't need this chrome (e.g. /admin) can extend BaseLayout directly.
+import BaseLayout from './BaseLayout.astro';
+import Header from '~/components/Header.astro';
+import MobileDrawer from '~/components/MobileDrawer.astro';
+import Footer from '~/components/Footer.astro';
+import KlaroBootstrap from '~/components/KlaroBootstrap.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  canonical?: string;
+  type?: 'website' | 'article';
+  publishedAt?: string;
+  author?: string;
+  category?: string;
+  tags?: string[];
+  sourceName?: string;
+  sourceUrl?: string;
+  noindex?: boolean;
+}
+---
+
+<BaseLayout {...Astro.props}>
+  <Header />
+  <MobileDrawer />
+  <main id="main">
+    <slot />
+  </main>
+  <Footer />
+  <KlaroBootstrap />
+</BaseLayout>

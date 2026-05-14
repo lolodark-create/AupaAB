@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Sud Ouest — Rugby Aviron Bayonnais</title>
+    <link>https://www.sudouest.fr/sport/rugby/aviron-bayonnais/</link>
+    <description>Toute l'actualité de l'Aviron Bayonnais</description>
+    <language>fr</language>
+
+    <item>
+      <title>Edwin Maka prolonge deux saisons à l'Aviron Bayonnais</title>
+      <link>https://www.sudouest.fr/sport/rugby/aviron-bayonnais/edwin-maka-prolonge-deux-saisons-1234.php</link>
+      <pubDate>Wed, 14 May 2026 09:00:00 +0200</pubDate>
+      <author>Pierre Lasserre</author>
+      <description>Le troisième-ligne fidjien, arrivé en 2022, a paraphé un nouveau contrat jusqu'en 2028. Le club tient l'un de ses cadres.</description>
+      <category>Rugby</category>
+    </item>
+
+    <item>
+      <title>Avant-match Bayonne — Toulouse : tout pour samedi soir à Jean-Dauger</title>
+      <link>https://www.sudouest.fr/sport/rugby/aviron-bayonnais/avant-match-toulouse-5678.php</link>
+      <pubDate>Wed, 14 May 2026 06:00:00 +0200</pubDate>
+      <author>Iban Etcheverry</author>
+      <description>L'Aviron Bayonnais reçoit le champion de France. Sept ans qu'on n'avait pas battu Toulouse à la maison.</description>
+      <category>Rugby</category>
+    </item>
+
+    <item>
+      <title>Crabos : les U18 de l'Aviron Bayonnais en finale du championnat</title>
+      <link>https://www.sudouest.fr/sport/rugby/aviron-bayonnais/crabos-finale-u18-9999.php</link>
+      <pubDate>Tue, 13 May 2026 18:30:00 +0200</pubDate>
+      <author>Jean-Marc Larrieu</author>
+      <description>Les jeunes du centre de formation l'emportent 24-19 face à Toulon dimanche. Trois espoirs surveillés par Patat.</description>
+      <category>Rugby</category>
+    </item>
+
+    <!-- Should NOT match: unrelated topic -->
+    <item>
+      <title>Le Stade Toulousain en démonstration en Top 14</title>
+      <link>https://www.sudouest.fr/sport/rugby/stade-toulousain-1111.php</link>
+      <pubDate>Tue, 13 May 2026 14:00:00 +0200</pubDate>
+      <description>Antoine Dupont décisif face à Pau ce week-end.</description>
+      <category>Rugby</category>
+    </item>
+
+    <!-- Should NOT match: missing AB keywords -->
+    <item>
+      <title>Manifestation dans le centre de Bayonne ce samedi</title>
+      <link>https://www.sudouest.fr/societe/bayonne-manif-2222.php</link>
+      <pubDate>Mon, 12 May 2026 12:00:00 +0200</pubDate>
+      <description>Cortège dans le centre-ville à 14h.</description>
+      <category>Société</category>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,161 @@
+---
+// ArticleCard — brief §8.2. 4 variants: featured, lead, row, compact.
+import Badge from './atoms/Badge.astro';
+import SourceChip from './atoms/SourceChip.astro';
+import Icon from './atoms/Icon.astro';
+import EditorialThumb from './EditorialThumb.astro';
+import { getSourceMeta } from '~/lib/sources';
+import type { ArticleCategory } from '@shared/types';
+
+type Variant = 'featured' | 'lead' | 'row' | 'compact';
+
+interface Props {
+  variant?: Variant;
+  slug: string;
+  title: string;
+  lede?: string | null;
+  category: ArticleCategory;
+  sourceSlug: string;
+  sourceName: string;
+  timeLabel: string;
+  dateLabel?: string;
+  readingMin: number;
+  commentCount: number;
+  class?: string;
+}
+
+const {
+  variant = 'row',
+  slug,
+  title,
+  lede,
+  category,
+  sourceSlug,
+  sourceName,
+  timeLabel,
+  dateLabel,
+  readingMin,
+  commentCount,
+  class: className,
+} = Astro.props;
+
+const href = `/article/${slug}`;
+const meta = getSourceMeta(sourceSlug);
+
+const categoryLabel: Record<ArticleCategory, string> = {
+  match: 'Match',
+  mercato: 'Mercato',
+  coulisses: 'Coulisses',
+  espoirs: 'Espoirs',
+  pays_basque: 'Pays Basque',
+  autre: 'À la une',
+};
+---
+
+{variant === 'featured' && (
+  <article class:list={['group bg-bg-elevated rounded-lg overflow-hidden border border-border-subtle transition-shadow hover:shadow-md grid md:grid-cols-[1.4fr_1fr]', className]}>
+    <a href={href} class="block aspect-[16/10] md:h-[460px] focus-visible:outline-none">
+      <EditorialThumb id={slug} title={title} category={category} sourceSlug={sourceSlug} sourceName={sourceName} dateLabel={dateLabel} size="lg" />
+    </a>
+    <div class="p-6 md:p-10 flex flex-col justify-center gap-4">
+      <div class="flex items-center gap-3 flex-wrap">
+        <Badge variant="category">{categoryLabel[category]}</Badge>
+        <SourceChip name={sourceName} mono={meta.mono} color={meta.color} />
+        <span class="text-xs text-fg-secondary">· {timeLabel}</span>
+      </div>
+      <h1 class="font-serif font-semibold text-3xl md:text-[42px] leading-[1.06] tracking-[-0.014em] m-0" style="text-wrap:balance; font-variation-settings:'opsz' 120, 'SOFT' 40;">
+        <a href={href} class="text-fg hover:text-aviron transition-colors">
+          {title}
+        </a>
+      </h1>
+      {lede && (
+        <p class="text-base md:text-[18px] leading-[1.55] text-fg-secondary m-0" style="text-wrap:pretty;">{lede}</p>
+      )}
+      <div class="flex items-center gap-4 mt-1 text-xs text-fg-secondary">
+        <a href={href} class="inline-flex items-center gap-2 px-4 h-10 rounded-md bg-aviron text-white dark:text-night font-medium text-[15px] hover:bg-aviron-press transition-colors">
+          Lire la suite
+          <Icon name="arrowRight" size={16} aria-hidden="true" />
+        </a>
+        <span class="inline-flex items-center gap-1"><Icon name="message" size={13} aria-hidden="true" /> {commentCount}</span>
+        <span class="inline-flex items-center gap-1"><Icon name="clock" size={13} aria-hidden="true" /> {readingMin} min</span>
+      </div>
+    </div>
+  </article>
+)}
+
+{variant === 'lead' && (
+  <article class:list={['group bg-bg-elevated rounded-lg overflow-hidden border border-border-subtle h-full flex flex-col transition-all hover:-translate-y-0.5 hover:shadow-md', className]}>
+    <a href={href} class="block aspect-[4/3] focus-visible:outline-none">
+      <EditorialThumb id={slug} title={title} category={category} sourceSlug={sourceSlug} sourceName={sourceName} dateLabel={dateLabel} size="md" />
+    </a>
+    <div class="p-5 flex flex-col gap-2.5 flex-1">
+      <div class="flex gap-2.5 items-center flex-wrap">
+        <Badge variant="category" size="sm">{categoryLabel[category]}</Badge>
+        <SourceChip name={sourceName} mono={meta.mono} color={meta.color} size="sm" />
+      </div>
+      <h2 class="font-serif font-semibold text-[22px] leading-[1.18] tracking-[-0.005em] m-0 overflow-hidden"
+          style="display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; text-wrap:balance;">
+        <a href={href} class="text-fg hover:text-aviron transition-colors">
+          {title}
+        </a>
+      </h2>
+      {lede && (
+        <p class="text-[14.5px] leading-[1.55] text-fg-secondary m-0 overflow-hidden"
+           style="display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2;">{lede}</p>
+      )}
+      <div class="mt-auto pt-2 flex justify-between items-center text-xs text-fg-secondary">
+        <span>{timeLabel}</span>
+        <span class="inline-flex gap-2.5">
+          <span class="inline-flex items-center gap-1"><Icon name="message" size={12} aria-hidden="true" /> {commentCount}</span>
+          <span class="inline-flex items-center gap-1"><Icon name="clock" size={12} aria-hidden="true" /> {readingMin}m</span>
+        </span>
+      </div>
+    </div>
+  </article>
+)}
+
+{variant === 'compact' && (
+  <a href={href} class:list={['flex gap-3 p-2 rounded-md hover:bg-bg-subtle transition-colors', className]}>
+    <span class="block w-20 h-20 shrink-0 rounded-sm overflow-hidden">
+      <EditorialThumb id={slug} title={title} category={category} sourceSlug={sourceSlug} sourceName={sourceName} size="xs" />
+    </span>
+    <span class="flex flex-col gap-1 min-w-0 flex-1">
+      <span class="t-meta text-[10.5px]">{categoryLabel[category]}</span>
+      <span class="font-serif font-medium text-[14.5px] leading-[1.25] text-fg overflow-hidden"
+            style="display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3;">{title}</span>
+      <span class="text-[11px] text-fg-secondary">{timeLabel}</span>
+    </span>
+  </a>
+)}
+
+{variant === 'row' && (
+  <article class:list={['group flex gap-4 md:gap-6 py-4 md:py-5 border-b border-border-subtle', className]}>
+    <a href={href} class="block w-24 h-24 md:w-[220px] md:h-[146px] shrink-0 rounded-md overflow-hidden focus-visible:outline-none">
+      <EditorialThumb id={slug} title={title} category={category} sourceSlug={sourceSlug} sourceName={sourceName} dateLabel={dateLabel} size="sm" />
+    </a>
+    <div class="flex-1 flex flex-col gap-1.5 md:gap-2 min-w-0">
+      <div class="flex gap-2.5 items-center flex-wrap">
+        <Badge variant="category" size="sm">{categoryLabel[category]}</Badge>
+        <span class="hidden md:inline-flex">
+          <SourceChip name={sourceName} mono={meta.mono} color={meta.color} size="sm" />
+        </span>
+        <span class="text-[11.5px] text-fg-secondary">· {timeLabel}</span>
+      </div>
+      <h2 class="font-serif font-medium text-[17px] md:text-[22px] leading-[1.2] tracking-[-0.005em] m-0 overflow-hidden"
+          style="display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; text-wrap:balance;">
+        <a href={href} class="text-fg hover:text-aviron transition-colors">{title}</a>
+      </h2>
+      {lede && (
+        <p class="hidden md:block text-[14.5px] leading-[1.5] text-fg-secondary m-0 overflow-hidden"
+           style="display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2;">{lede}</p>
+      )}
+      <div class="mt-auto flex gap-3.5 text-[11.5px] text-fg-secondary items-center">
+        <span class="inline-flex md:hidden">
+          <SourceChip name={sourceName} mono={meta.mono} color={meta.color} size="sm" />
+        </span>
+        <span class="inline-flex items-center gap-1"><Icon name="message" size={13} aria-hidden="true" /> {commentCount}</span>
+        <span class="inline-flex items-center gap-1"><Icon name="clock" size={13} aria-hidden="true" /> {readingMin} min</span>
+      </div>
+    </div>
+  </article>
+)}

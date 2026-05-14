@@ -1,0 +1,27 @@
+---
+import Lauburu from './atoms/Lauburu.astro';
+interface Props {
+  variant?: 'full' | 'mark';
+  size?: number;
+  class?: string;
+}
+const { variant = 'full', size = 36, class: className } = Astro.props;
+---
+
+<a href="/" class:list={['flex items-center gap-2.5 group', className]} aria-label="AUPA AB — accueil">
+  <span
+    class="inline-flex items-center justify-center rounded-md bg-night text-white shrink-0"
+    style={`width:${size}px; height:${size}px;`}
+    aria-hidden="true"
+  >
+    <Lauburu size={Math.round(size * 0.65)} stroke="#3FB0E5" strokeWidth={1.5} />
+  </span>
+  {variant === 'full' && (
+    <span class="flex flex-col leading-none">
+      <span class="font-serif font-semibold text-fg" style="font-size:1.05rem; letter-spacing:-0.005em;">
+        AUPA <span class="text-aviron">AB</span>
+      </span>
+      <span class="t-meta text-[9.5px] mt-1">Tribune des supporters</span>
+    </span>
+  )}
+</a>

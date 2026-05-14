@@ -1,0 +1,24 @@
+---
+// Source chip — source mono + name.
+interface Props {
+  name: string;
+  mono: string;
+  color: string;
+  size?: 'sm' | 'md';
+  class?: string;
+}
+
+const { name, mono, color, size = 'md', class: className } = Astro.props;
+const dims = size === 'sm' ? { box: 16, font: 8.5, label: 11 } : { box: 20, font: 10, label: 12 };
+---
+
+<span class:list={['inline-flex items-center gap-1.5', className]}>
+  <span
+    class="inline-flex items-center justify-center text-white font-bold rounded-[3px]"
+    style={`width:${dims.box}px; height:${dims.box}px; background:${color}; font-size:${dims.font}px;`}
+    aria-hidden="true"
+  >
+    {mono}
+  </span>
+  <span class="text-fg-secondary font-medium" style={`font-size:${dims.label}px`}>{name}</span>
+</span>

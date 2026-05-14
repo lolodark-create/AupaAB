@@ -1,0 +1,54 @@
+---
+import SiteShell from '~/layouts/SiteShell.astro';
+import Prose from '~/components/Prose.astro';
+---
+
+<SiteShell title="Cookies & traceurs" description="La liste exhaustive de ce qu'on dépose dans votre navigateur.">
+  <Prose title="Cookies & traceurs" kicker="Transparence" updated="14 mai 2026">
+    <h2>En V1 — aucun cookie tiers</h2>
+    <p>
+      AUPA AB n'utilise <strong>aucun cookie tiers</strong> dans sa version actuelle. Notre seule mesure d'audience est <a href="https://plausible.io" target="_blank" rel="noopener">Plausible Analytics</a>, qui fonctionne <em>sans cookie ni identifiant individuel</em>, en agrégat anonyme côté serveur.
+    </p>
+
+    <h2>Cookies fonctionnels (sans consentement)</h2>
+    <table class="w-full text-[14px] border-collapse">
+      <thead>
+        <tr class="border-b border-border-default">
+          <th class="text-left py-2">Nom</th>
+          <th class="text-left py-2">Origine</th>
+          <th class="text-left py-2">Finalité</th>
+          <th class="text-left py-2">Durée</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-border-subtle">
+          <td class="py-2"><code>aupa-theme</code></td>
+          <td>AUPA AB (localStorage, pas un cookie HTTP)</td>
+          <td>Mémorise votre choix clair / sombre</td>
+          <td>Permanent (vous pouvez l'effacer)</td>
+        </tr>
+        <tr class="border-b border-border-subtle">
+          <td class="py-2"><code>klaro</code></td>
+          <td>AUPA AB</td>
+          <td>Mémorise vos choix CMP</td>
+          <td>1 an</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Cookies avec consentement (V2)</h2>
+    <p>
+      À partir de la V2 (commentaires + publicité), des cookies optionnels seront proposés :
+    </p>
+    <ul>
+      <li><strong>Session</strong> (fonctionnel, requis si compte) : <code>sb-access-token</code>, <code>sb-refresh-token</code>. Durée : 7 jours, renouvelables.</li>
+      <li><strong>Google AdSense</strong> (marketing) : <code>__gads</code>, <code>IDE</code>, <code>test_cookie</code>. Durée : 2 ans. Activé uniquement si consentement.</li>
+      <li><strong>Google Analytics 4</strong> (analytics) : <code>_ga</code>, <code>_gid</code>. Désactivé par défaut.</li>
+    </ul>
+
+    <h2>Gérer vos préférences</h2>
+    <p>
+      Vous pouvez modifier vos choix à tout moment via le bouton "Cookies" en pied de page (CMP Klaro!).
+    </p>
+  </Prose>
+</SiteShell>

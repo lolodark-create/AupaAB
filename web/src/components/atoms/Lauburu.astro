@@ -1,0 +1,37 @@
+---
+// Basque cross (lauburu) — brief §6 + §7.1.
+// Used as accent in logos, watermarks, empty states.
+interface Props {
+  size?: number;
+  stroke?: string;
+  fill?: string;
+  strokeWidth?: number;
+  opacity?: number;
+  class?: string;
+}
+
+const {
+  size = 24,
+  stroke = 'currentColor',
+  fill = 'none',
+  strokeWidth = 1.5,
+  opacity = 1,
+  class: className,
+} = Astro.props;
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 100 100"
+  style={`opacity:${opacity}`}
+  class={className}
+  aria-hidden="true"
+>
+  <g stroke={stroke} fill={fill} stroke-width={strokeWidth} stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" />
+    <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="rotate(90 50 50)" />
+    <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="rotate(180 50 50)" />
+    <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="rotate(270 50 50)" />
+  </g>
+</svg>

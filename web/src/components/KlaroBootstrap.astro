@@ -1,0 +1,32 @@
+---
+// Klaro! CMP — loaded ON DEMAND only when the user clicks "Préférences cookies".
+//
+// V1 stance: Plausible is cookieless (CNIL-exempt), no third-party trackers, no
+// AdSense, so no banner is legally required. Loading Klaro's 200KB JS + 20KB CSS
+// on every page would tank LCP for nothing.
+//
+// The footer button injects the script + stylesheet on first click. The
+// klaroConfig is set inline so Klaro picks it up immediately when it loads.
+import { klaroConfig } from '~/lib/klaro-config.js';
+
+const klaroConfigJson = JSON.stringify(klaroConfig);
+---
+
+<div id="klaro"></div>
+
+<script is:inline set:html={`window.klaroConfig = ${klaroConfigJson};
+window.__loadKlaro = function () {
+  if (window.__klaroLoading) return window.__klaroLoading;
+  window.__klaroLoading = new Promise(function (resolve, reject) {
+    var css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = '/klaro.min.css';
+    document.head.appendChild(css);
+    var s = document.createElement('script');
+    s.src = '/klaro-no-css.js';
+    s.onload = function () { resolve(window.klaro); };
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+  return window.__klaroLoading;
+};`} />

@@ -1,0 +1,106 @@
+---
+// Header — brief §8.8 + design §9.
+// Sticky, backdrop-blur, theme toggle (vanilla JS), nav, search shortcut, mobile burger.
+import Logo from './Logo.astro';
+import Icon from './atoms/Icon.astro';
+
+const navItems = [
+  { href: '/', label: 'À la une' },
+  { href: '/actu', label: 'Actualités' },
+  { href: '/actu?cat=match', label: 'Match' },
+  { href: '/actu?cat=mercato', label: 'Mercato' },
+  { href: '/sources', label: 'Sources' },
+];
+
+const current = Astro.url.pathname;
+const isActive = (href: string) => {
+  const base = href.split('?')[0];
+  return current === base || (base !== '/' && current.startsWith(base));
+};
+---
+
+<header
+  class="sticky top-0 z-50 border-b border-border-subtle backdrop-blur-md"
+  style="background: rgb(var(--bg-default) / 0.92);"
+>
+  {/* Mobile */}
+  <div class="md:hidden flex items-center gap-3 h-14 px-4">
+    <Logo variant="mark" size={32} />
+    <span class="flex-1" />
+    <a href="/recherche" class="p-2 text-fg" aria-label="Recherche">
+      <Icon name="search" size={20} />
+    </a>
+    <button id="theme-toggle-m" class="p-2 text-fg" aria-label="Changer de thème">
+      <Icon name="moon" size={20} class="theme-icon-light" />
+      <Icon name="sun" size={20} class="theme-icon-dark hidden" />
+    </button>
+    <button id="drawer-open" class="p-2 text-fg" aria-label="Menu" aria-controls="mobile-drawer" aria-expanded="false">
+      <Icon name="menu" size={22} />
+    </button>
+  </div>
+
+  {/* Desktop */}
+  <div class="hidden md:flex max-w-container mx-auto px-8 h-[72px] items-center gap-8">
+    <Logo size={36} />
+    <nav class="flex gap-1 flex-1 justify-center" aria-label="Navigation principale">
+      {navItems.map((n) => {
+        const active = isActive(n.href);
+        return (
+          <a
+            href={n.href}
+            class:list={[
+              'relative px-3.5 py-2.5 text-sm font-medium rounded-md transition-colors',
+              active ? 'text-fg' : 'text-fg-secondary hover:text-fg',
+            ]}
+            aria-current={active ? 'page' : undefined}
+          >
+            {n.label}
+            {active && <span class="absolute -bottom-px left-3.5 right-3.5 h-0.5 bg-aviron rounded-[1px]" aria-hidden="true" />}
+          </a>
+        );
+      })}
+    </nav>
+    <div class="flex items-center gap-1">
+      <a
+        href="/recherche"
+        class="inline-flex items-center gap-2 px-3.5 py-2 rounded-md border border-border-subtle bg-bg-elevated text-fg-secondary text-[13px] min-w-[180px]"
+      >
+        <Icon name="search" size={15} aria-hidden="true" />
+        <span class="flex-1 text-left">Recherche…</span>
+        <kbd class="text-[10px] font-medium bg-bg-subtle px-1.5 py-px rounded-sm text-fg-tertiary">⌘ K</kbd>
+      </a>
+      <button id="theme-toggle-d" class="p-2 rounded-md text-fg" aria-label="Changer de thème">
+        <Icon name="moon" size={18} class="theme-icon-light" />
+        <Icon name="sun" size={18} class="theme-icon-dark hidden" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<script is:inline>
+  (function () {
+    function applyIcons() {
+      const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.querySelectorAll('.theme-icon-light').forEach((el) => el.classList.toggle('hidden', dark));
+      document.querySelectorAll('.theme-icon-dark').forEach((el) => el.classList.toggle('hidden', !dark));
+    }
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      const next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('aupa-theme', next); } catch (e) {}
+      applyIcons();
+    }
+    applyIcons();
+    document.getElementById('theme-toggle-m')?.addEventListener('click', toggleTheme);
+    document.getElementById('theme-toggle-d')?.addEventListener('click', toggleTheme);
+
+    // ⌘K → recherche
+    document.addEventListener('keydown', function (e) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        window.location.assign('/recherche');
+      }
+    });
+  })();
+</script>

@@ -1,0 +1,47 @@
+---
+// Avatar — brief §8.5. Round; deterministic background colour from username if no image.
+interface Props {
+  username?: string;
+  displayName?: string | null;
+  src?: string | null;
+  size?: 24 | 32 | 40 | 48 | 64 | 96;
+  class?: string;
+}
+
+const { username, displayName, src, size = 40, class: className } = Astro.props;
+
+// Deterministic colour pick — brief §8.5: blue / sand / night palette
+const PALETTE = ['#0B2545', '#0099D8', '#5A6472', '#D52B1E', '#2F8F4F'] as const;
+function hash(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+const seed = username ?? displayName ?? '?';
+const bg = PALETTE[hash(seed) % PALETTE.length];
+const initial = (displayName?.[0] ?? username?.[0] ?? '?').toUpperCase();
+const fontSize = size * 0.4;
+const alt = displayName ?? username ?? 'Utilisateur';
+---
+
+{
+  src ? (
+    <img
+      src={src}
+      alt=""
+      width={size}
+      height={size}
+      class:list={['rounded-full object-cover shrink-0', className]}
+      loading="lazy"
+    />
+  ) : (
+    <span
+      class:list={['inline-flex items-center justify-center rounded-full text-white font-semibold shrink-0', className]}
+      style={`width:${size}px; height:${size}px; background:${bg}; font-size:${fontSize}px;`}
+      role="img"
+      aria-label={alt}
+    >
+      {initial}
+    </span>
+  )
+}

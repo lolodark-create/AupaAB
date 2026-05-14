@@ -1,0 +1,107 @@
+---
+import SiteShell from '~/layouts/SiteShell.astro';
+import Button from '~/components/atoms/Button.astro';
+
+const urlParam = Astro.url.searchParams.get('url') ?? '';
+const submitted = Astro.url.searchParams.get('ok') === '1';
+---
+
+<SiteShell
+  title="Demande de retrait"
+  description="Vous êtes éditeur d'une source : demandez le retrait d'un de vos articles agrégés sur AUPA AB. Réponse sous 24h."
+  noindex
+>
+  <div class="max-w-reading mx-auto px-4 md:px-6 pt-10 md:pt-16 pb-16">
+    <span class="t-meta text-aviron">Procédure éditeur</span>
+    <h1 class="mt-1 mb-4 font-serif font-semibold text-[32px] md:text-[40px] leading-[1.06]" style="font-variation-settings:'opsz' 96, 'SOFT' 30;">
+      Demande de retrait d'un article
+    </h1>
+    <p class="text-[17px] leading-[1.65] text-fg-secondary mb-8">
+      Vous êtes éditeur d'un média référencé et souhaitez que nous retirions un ou plusieurs de vos articles ? Ce formulaire est fait pour ça. <strong class="text-fg">Réponse garantie sous 24h ouvrées</strong> ; retrait effectif sous 6h si la demande est fondée.
+    </p>
+
+    {submitted ? (
+      <div class="p-6 rounded-lg border border-basque/40 bg-basque/10">
+        <h2 class="mt-0 mb-2 font-serif font-semibold text-[20px]">Demande enregistrée</h2>
+        <p class="m-0 text-[14.5px] text-fg-secondary">
+          On vous recontactera par email dans les 24h. Si la demande est urgente (RGPD, atteinte aux droits), précisez-le dans votre message — on traite ces cas en priorité.
+        </p>
+      </div>
+    ) : (
+      <form method="post" action="/api/takedown" class="space-y-5">
+        <div>
+          <label for="email" class="block text-sm font-medium mb-1.5">Email professionnel <span aria-hidden="true" class="text-danger">*</span></label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            autocomplete="email"
+            class="w-full px-3 py-2.5 text-[15px] bg-bg-elevated border border-border-default rounded-md focus:outline-none focus:border-aviron"
+          />
+        </div>
+        <div>
+          <label for="organization" class="block text-sm font-medium mb-1.5">Organisation</label>
+          <input
+            id="organization"
+            name="organization"
+            type="text"
+            placeholder="Sud Ouest, L'Équipe…"
+            class="w-full px-3 py-2.5 text-[15px] bg-bg-elevated border border-border-default rounded-md focus:outline-none focus:border-aviron"
+          />
+        </div>
+        <div>
+          <label for="url" class="block text-sm font-medium mb-1.5">URL concernée <span aria-hidden="true" class="text-danger">*</span></label>
+          <input
+            id="url"
+            name="url"
+            type="url"
+            required
+            value={urlParam}
+            placeholder="https://aupa-ab.com/article/..."
+            class="w-full px-3 py-2.5 text-[15px] bg-bg-elevated border border-border-default rounded-md focus:outline-none focus:border-aviron"
+          />
+          <p class="mt-1 text-xs text-fg-tertiary">Vous pouvez aussi mettre l'URL de l'article source pour un retrait global.</p>
+        </div>
+        <div>
+          <label for="reason" class="block text-sm font-medium mb-1.5">Motif <span aria-hidden="true" class="text-danger">*</span></label>
+          <select
+            id="reason"
+            name="reason"
+            required
+            class="w-full px-3 py-2.5 text-[15px] bg-bg-elevated border border-border-default rounded-md focus:outline-none focus:border-aviron"
+          >
+            <option value="">— Sélectionnez —</option>
+            <option value="copyright">Atteinte au droit d'auteur</option>
+            <option value="gdpr">RGPD (données personnelles)</option>
+            <option value="defamation">Diffamation / atteinte</option>
+            <option value="other">Autre</option>
+          </select>
+        </div>
+        <div>
+          <label for="message" class="block text-sm font-medium mb-1.5">Message</label>
+          <textarea
+            id="message"
+            name="message"
+            rows="5"
+            class="w-full px-3 py-2.5 text-[15px] font-sans bg-bg-elevated border border-border-default rounded-md focus:outline-none focus:border-aviron resize-y"
+          ></textarea>
+        </div>
+        <div class="flex items-center gap-3 pt-2">
+          <Button variant="primary" type="submit">Envoyer la demande</Button>
+          <a href="/" class="text-sm text-fg-secondary hover:text-fg">Annuler</a>
+        </div>
+      </form>
+    )}
+
+    <hr class="my-10 border-border-subtle" />
+
+    <h2 class="font-serif font-semibold text-xl mb-3">Engagement éditorial</h2>
+    <ul class="space-y-2 text-[14.5px] text-fg-secondary list-disc pl-5">
+      <li>Toute demande d'éditeur source est traitée prioritairement (≤ 24h).</li>
+      <li>Nous documentons chaque retrait dans nos logs internes (audit trail RGPD).</li>
+      <li>Sur demande explicite, nous pouvons bannir un domaine source dans son ensemble pour éviter toute future ingestion.</li>
+      <li>Si vous êtes un particulier mentionné, contactez plutôt notre DPO à <a href="mailto:dpo@aupa-ab.com" class="text-aviron underline">dpo@aupa-ab.com</a>.</li>
+    </ul>
+  </div>
+</SiteShell>

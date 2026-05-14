@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /mon-compte/
+Disallow: /auth/
+
+Sitemap: https://aupa-ab.com/sitemap-index.xml

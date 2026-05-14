@@ -1,0 +1,97 @@
+---
+import Logo from './Logo.astro';
+import Lauburu from './atoms/Lauburu.astro';
+import { SOURCE_META } from '~/lib/sources';
+
+const visibleSources = Object.entries(SOURCE_META).slice(0, 6);
+---
+
+<footer class="bg-bg-subtle border-t border-border-subtle mt-16 px-5 md:px-8 py-10 md:py-16">
+  <div class="max-w-container mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-[1.4fr_1fr_1fr_1fr] gap-8 md:gap-12 mb-10">
+      <div>
+        <Logo size={40} />
+        <p class="mt-5 text-[14.5px] leading-relaxed text-fg-secondary max-w-[340px]">
+          L'agrégateur d'actualités <em>officiellement non-officiel</em> de l'Aviron Bayonnais. Fait par des supporters, pour des supporters. Pas de pop-up, pas de carrousel, juste du rugby.
+        </p>
+        <p class="mt-3 text-xs text-fg-tertiary">
+          Site indépendant · Aucun lien capitalistique avec le club
+        </p>
+      </div>
+
+      <div>
+        <h2 class="t-meta mb-4">Le site</h2>
+        <ul class="space-y-2.5">
+          <li><a href="/" class="text-sm text-fg hover:text-aviron">À la une</a></li>
+          <li><a href="/actu" class="text-sm text-fg hover:text-aviron">Toutes les actualités</a></li>
+          <li><a href="/recherche" class="text-sm text-fg hover:text-aviron">Recherche</a></li>
+          <li><a href="/sources" class="text-sm text-fg hover:text-aviron">Sources surveillées</a></li>
+          <li><a href="/a-propos" class="text-sm text-fg hover:text-aviron">À propos</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="t-meta mb-4">Sources</h2>
+        <ul class="space-y-2.5 text-sm text-fg">
+          {visibleSources.map(([key, meta]) => (
+            <li>
+              <span class="inline-flex items-center gap-2">
+                <span
+                  class="inline-flex items-center justify-center w-4 h-4 rounded-[3px] text-white font-bold text-[8px]"
+                  style={`background:${meta.color}`}
+                  aria-hidden="true"
+                >{meta.mono}</span>
+                {key}
+              </span>
+            </li>
+          ))}
+          <li><a href="/sources" class="text-[13px] text-aviron hover:underline">Voir toutes les sources →</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="t-meta mb-4">Légal</h2>
+        <ul class="space-y-2.5 text-sm text-fg">
+          <li><a href="/charte" class="hover:text-aviron">Charte</a></li>
+          <li><a href="/mentions-legales" class="hover:text-aviron">Mentions légales</a></li>
+          <li><a href="/confidentialite" class="hover:text-aviron">Confidentialité</a></li>
+          <li><a href="/cgu" class="hover:text-aviron">CGU</a></li>
+          <li><a href="/cookies" class="hover:text-aviron">Cookies</a></li>
+          <li><a href="/contact-retrait" class="hover:text-aviron">Demande de retrait</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pt-6 border-t border-border-subtle flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+      <span class="text-xs text-fg-tertiary">
+        © 2026 AUPA AB · <em>Construit à Bayonne, lu partout</em>
+      </span>
+      <div class="flex items-center gap-4">
+        <button
+          type="button"
+          id="klaro-open"
+          class="text-xs text-fg-tertiary hover:text-aviron underline underline-offset-2"
+        >
+          Préférences cookies
+        </button>
+        <span class="flex items-center gap-2">
+          <Lauburu size={20} stroke="rgb(var(--c-aviron))" strokeWidth={1.5} />
+          <span class="text-[11px] text-fg-tertiary tracking-wide"><em>Aupa hi !</em></span>
+        </span>
+      </div>
+    </div>
+
+    <script is:inline>
+      document.getElementById('klaro-open')?.addEventListener('click', async function () {
+        // Lazy-load Klaro on first click — its 200KB JS isn't needed for the
+        // V1 baseline (Plausible cookieless), so we don't ship it on every page.
+        if (window.__loadKlaro) {
+          const k = await window.__loadKlaro();
+          if (k && typeof k.show === 'function') k.show(undefined, true);
+        } else if (window.klaro && typeof window.klaro.show === 'function') {
+          window.klaro.show(undefined, true);
+        }
+      });
+    </script>
+  </div>
+</footer>
