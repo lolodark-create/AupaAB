@@ -1,64 +1,60 @@
 ---
-// Editorial auto-thumbnail — brief §7.1. 4 visual variants × 4 sizes.
-// Variant is deterministic from the article id unless overridden.
+// Editorial auto-thumbnail.
+//
+// Was: title rendered as large type on a colored card. Problem: every
+// ArticleCard variant ALSO renders the title as <h2>, so the visible title
+// appeared twice per card — pure noise. Now: a typographic source-brand chip
+// (large monogram, category, date, decorative motif) with NO title text. The
+// card body owns the title.
+//
+// Variant background is tied to the SOURCE brand color, so a reader can spot
+// "this is a Sud Ouest piece" at a glance — same skim cue as a physical
+// magazine using a publisher's masthead color.
 import { getSourceMeta } from '~/lib/sources';
 import type { ArticleCategory } from '@shared/types';
 
-type Variant = 'night' | 'sand' | 'aviron' | 'wave';
 type Size = 'xs' | 'sm' | 'md' | 'lg';
 
 interface Props {
   id: string;
-  title: string;
+  title: string; // kept for aria-label only — never rendered as visible text
   category: ArticleCategory;
   dateLabel?: string;
   sourceSlug: string;
   sourceName: string;
   size?: Size;
-  variant?: Variant;
   class?: string;
 }
 
-const { id, title, category, dateLabel, sourceSlug, sourceName, size = 'md', variant, class: className } = Astro.props;
+const { id, title, category, dateLabel, sourceSlug, sourceName, size = 'md', class: className } = Astro.props;
 const meta = getSourceMeta(sourceSlug);
 
-// Pick a variant deterministically if not overridden — brief §7.1 (rotation pour éviter monotonie)
-function pickVariant(): Variant {
-  if (variant) return variant;
-  if (category === 'pays_basque') return 'wave';
-  const seed = (id.charCodeAt(0) + (id.charCodeAt(1) ?? 0)) % 3;
-  return (['night', 'sand', 'aviron'] as const)[seed];
-}
-const chosen = pickVariant();
-
-// `lg` is used in the hero (featured) card on both mobile and desktop.
-// Mobile width 375 with aspect-[16/10] gives ~234px of vertical space, so
-// the lg title font needs to fit 4 lines (clamp at viewport).
-const tokens: Record<Size, { titleFont: number; padding: number; monoFont: number; lines: number }> = {
-  xs: { titleFont: 13, padding: 10, monoFont: 8, lines: 3 },
-  sm: { titleFont: 16, padding: 14, monoFont: 9, lines: 3 },
-  md: { titleFont: 22, padding: 20, monoFont: 10, lines: 4 },
-  lg: { titleFont: 28, padding: 28, monoFont: 11, lines: 4 },
+// Size scale. monoFont drives the LARGE typographic mark in the center —
+// that's the visual identity now that the title is gone.
+const tokens: Record<Size, {
+  padding: number;
+  smallMono: number;  // top + bottom strip text
+  bigMono: number;    // centerpiece source mono
+}> = {
+  xs: { padding: 8,  smallMono: 8,  bigMono: 22 },
+  sm: { padding: 14, smallMono: 9,  bigMono: 44 },
+  md: { padding: 20, smallMono: 10, bigMono: 72 },
+  lg: { padding: 28, smallMono: 11, bigMono: 120 },
 };
 const t = tokens[size];
 
-// Use CSS clamp() so the hero title scales up to ~38px on wide viewports
-// without overflowing on mobile.
 const isHero = size === 'lg';
-const titleFontStyle = isHero
-  ? 'font-size: clamp(24px, 4vw, 38px)'
-  : `font-size: ${t.titleFont}px`;
-const padStyle = isHero
-  ? 'padding: clamp(20px, 3vw, 44px)'
-  : `padding: ${t.padding}px`;
+const padStyle = isHero ? 'padding: clamp(20px, 3vw, 36px)' : `padding: ${t.padding}px`;
+const bigMonoSize = isHero
+  ? 'font-size: clamp(64px, 11vw, 120px)'
+  : `font-size: ${t.bigMono}px`;
 
-const palettes: Record<Variant, { bg: string; fg: string; filFG: string }> = {
-  night: { bg: '#0B2545', fg: '#FAFAF7', filFG: '#3FB0E5' },
-  sand: { bg: '#EFEAE0', fg: '#0B2545', filFG: '#0099D8' },
-  aviron: { bg: '#0099D8', fg: '#FAFAF7', filFG: '#FAFAF7' },
-  wave: { bg: '#0099D8', fg: '#FAFAF7', filFG: '#FAFAF7' },
-};
-const p = palettes[chosen];
+// Source brand color drives the whole card. We darken slightly for the bg so
+// the white type stays above WCAG AA against it. Each color in lib/sources is
+// already ≥ 5:1 for white type, so use as-is.
+const bg = meta.color;
+const fg = '#FAFAF7';
+const filFG = '#FFFFFF';
 
 const categoryLabel: Record<ArticleCategory, string> = {
   match: 'Match',
@@ -68,22 +64,75 @@ const categoryLabel: Record<ArticleCategory, string> = {
   pays_basque: 'Pays Basque',
   autre: '',
 };
+
+// Each category gets its own filigree motif — geometric for match, arrows
+// for mercato, dots for espoirs, wave for pays_basque, lines for coulisses.
+// Decorative only (aria-hidden), provides visual variety so the grid of
+// cards isn't a wall of identical brand chips.
+type MotifKind = 'rugby' | 'arrows' | 'dots' | 'wave' | 'lines' | 'lauburu';
+const motifFor: Record<ArticleCategory, MotifKind> = {
+  match: 'rugby',
+  mercato: 'arrows',
+  espoirs: 'dots',
+  pays_basque: 'wave',
+  coulisses: 'lines',
+  autre: 'lauburu',
+};
+const motif = motifFor[category];
 ---
 
 <div
   class:list={['relative w-full h-full overflow-hidden flex flex-col justify-between', className]}
-  style={`background:${p.bg}; color:${p.fg}; ${padStyle};`}
+  style={`background:${bg}; color:${fg}; ${padStyle};`}
   role="img"
   aria-label={`${title} — vignette ${sourceName}`}
 >
-  {/* Filigree per variant */}
-  {chosen === 'night' && (
-    <svg
-      class="absolute -right-[15%] top-1/2 -translate-y-1/2 opacity-[0.06] w-[120%] h-[120%]"
-      viewBox="0 0 100 100"
-      aria-hidden="true"
-    >
-      <g stroke={p.filFG} fill="none" stroke-width="0.8">
+  {/* Decorative motif, varies by category */}
+  {motif === 'rugby' && (
+    <svg class="absolute -right-[10%] top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none" width="120%" height="120%" viewBox="0 0 100 100" aria-hidden="true">
+      <ellipse cx="50" cy="50" rx="38" ry="22" fill="none" stroke={filFG} stroke-width="0.6" transform="rotate(-22 50 50)" />
+      <ellipse cx="50" cy="50" rx="38" ry="22" fill="none" stroke={filFG} stroke-width="0.6" transform="rotate(22 50 50)" />
+      <line x1="20" y1="50" x2="80" y2="50" stroke={filFG} stroke-width="0.6" />
+      <line x1="35" y1="46" x2="35" y2="54" stroke={filFG} stroke-width="0.6" />
+      <line x1="45" y1="46" x2="45" y2="54" stroke={filFG} stroke-width="0.6" />
+      <line x1="55" y1="46" x2="55" y2="54" stroke={filFG} stroke-width="0.6" />
+      <line x1="65" y1="46" x2="65" y2="54" stroke={filFG} stroke-width="0.6" />
+    </svg>
+  )}
+  {motif === 'arrows' && (
+    <svg class="absolute inset-0 opacity-[0.09] pointer-events-none" width="100%" height="100%" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <g transform={`translate(${i * 50 - 20} ${i * 30 - 30})`}>
+          <path d={`M0 80 L60 80 M50 75 L60 80 L50 85`} stroke={filFG} stroke-width="1.5" fill="none" stroke-linecap="round" />
+        </g>
+      ))}
+    </svg>
+  )}
+  {motif === 'dots' && (
+    <svg class="absolute inset-0 opacity-[0.10] pointer-events-none" width="100%" height="100%" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      {Array.from({ length: 6 }).flatMap((_, r) =>
+        Array.from({ length: 8 }).map((_, c) => (
+          <circle cx={c * 30 + 15} cy={r * 32 + 16} r={c % 2 === 0 ? 2 : 3} fill={filFG} />
+        ))
+      )}
+    </svg>
+  )}
+  {motif === 'wave' && (
+    <svg class="absolute inset-0 opacity-[0.14] pointer-events-none" width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 110 Q 50 70, 100 110 T 200 110 T 300 110 T 400 110 V 200 H 0 Z" fill={filFG} />
+      <path d="M0 140 Q 50 110, 100 140 T 200 140 T 300 140 T 400 140 V 200 H 0 Z" fill={filFG} opacity="0.5" />
+    </svg>
+  )}
+  {motif === 'lines' && (
+    <svg class="absolute inset-0 opacity-[0.08] pointer-events-none" width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <line x1={i * 80} y1="0" x2={i * 80 - 120} y2="200" stroke={filFG} stroke-width="24" />
+      ))}
+    </svg>
+  )}
+  {motif === 'lauburu' && (
+    <svg class="absolute -right-[10%] top-1/2 -translate-y-1/2 opacity-[0.07] pointer-events-none" width="120%" height="120%" viewBox="0 0 100 100" aria-hidden="true">
+      <g stroke={filFG} fill="none" stroke-width="0.7">
         <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" />
         <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="rotate(90 50 50)" />
         <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="rotate(180 50 50)" />
@@ -91,79 +140,47 @@ const categoryLabel: Record<ArticleCategory, string> = {
       </g>
     </svg>
   )}
-  {chosen === 'sand' && (
-    <span
-      class="absolute"
-      style={`left:${t.padding}px; right:${t.padding}px; bottom:${Math.round(t.padding * 0.7)}px; height:2px; background:rgb(0 153 216);`}
-      aria-hidden="true"
-    />
-  )}
-  {chosen === 'wave' && (
-    <svg class="absolute inset-0 opacity-[0.18]" width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M0 100 Q 50 60, 100 100 T 200 100 T 300 100 T 400 100 V 200 H 0 Z" fill={p.filFG} />
-      <path d="M0 130 Q 50 100, 100 130 T 200 130 T 300 130 T 400 130 V 200 H 0 Z" fill={p.filFG} opacity="0.5" />
-    </svg>
-  )}
-  {chosen === 'aviron' && (
-    <svg class="absolute inset-0 opacity-[0.08]" width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <line x1={i * 80} y1="0" x2={i * 80 - 120} y2="200" stroke={p.filFG} stroke-width="40" />
-      ))}
-    </svg>
-  )}
 
-  {/* Top: source mono + date */}
+  {/* Top: source name + date */}
   <div class="relative z-[1] flex items-center justify-between">
-    <span class="inline-flex items-center gap-1.5 uppercase font-semibold tracking-[0.1em] opacity-[0.85]" style={`font-size:${t.monoFont + 1}px;`}>
-      <span
-        class="inline-flex items-center justify-center font-bold rounded-[3px]"
-        style={`width:${t.monoFont * 2 + 4}px; height:${t.monoFont * 2 + 4}px;
-          background:${chosen === 'night' ? p.fg : chosen === 'sand' ? p.bg : 'rgba(255,255,255,0.2)'};
-          color:${chosen === 'night' ? p.bg : chosen === 'sand' ? p.fg : p.fg};
-          font-size:${t.monoFont}px;`}
-      >
-        {meta.mono}
-      </span>
-      <span>{sourceName}</span>
+    <span class="uppercase font-semibold tracking-[0.12em] opacity-[0.85]" style={`font-size:${t.smallMono + 1}px;`}>
+      {sourceName}
     </span>
     {size !== 'xs' && dateLabel && (
-      <span class="uppercase tracking-[0.08em] font-medium opacity-70" style={`font-size:${t.monoFont + 1}px;`}>
+      <span class="uppercase tracking-[0.08em] font-medium opacity-70" style={`font-size:${t.smallMono + 1}px;`}>
         {dateLabel}
       </span>
     )}
   </div>
 
-  {/* Middle: title.
-      Not a real heading — the parent card / page already provides the heading.
-      Using <p> avoids breaking heading-order in lists where the thumb appears
-      DOM-first inside an article whose <h2> follows. The image already exposes
-      the title via aria-label on the role="img" wrapper. */}
-  <div class="relative z-[1] flex-1 flex items-center" style={`padding-top:${Math.round(t.padding * 0.4)}px; padding-bottom:${Math.round(t.padding * 0.4)}px;`}>
-    <p
-      class="font-serif font-semibold m-0 overflow-hidden"
+  {/* Center: large source monogram. This is the visual identity now —
+      same energy as a magazine's masthead. No title text means no
+      duplication with the <h2> in the card body. */}
+  <div class="relative z-[1] flex-1 flex items-center justify-center">
+    <span
+      class="font-serif font-semibold leading-none"
       aria-hidden="true"
-      style={`color:${p.fg};
-        ${titleFontStyle};
-        line-height:1.08;
-        letter-spacing:-0.012em;
-        font-variation-settings:'opsz' 96, 'SOFT' 40;
-        display:-webkit-box;
-        -webkit-box-orient:vertical;
-        -webkit-line-clamp:${t.lines};`}
+      style={`color:${fg};
+        ${bigMonoSize};
+        letter-spacing:-0.04em;
+        font-variation-settings:'opsz' 144;
+        opacity:0.95;`}
     >
-      {title}
-    </p>
+      {meta.mono}
+    </span>
   </div>
 
-  {/* Bottom: monogram + category */}
-  <div class="relative z-[1] flex items-end justify-between">
-    <span class="tracking-[0.18em] font-bold opacity-70 uppercase" style={`font-size:${t.monoFont + 1}px;`}>
-      AUPA · AB
-    </span>
-    {size !== 'xs' && categoryLabel[category] && (
-      <span class="tracking-[0.06em] font-medium opacity-80 uppercase" style={`font-size:${t.monoFont + 1}px;`}>
+  {/* Bottom: category + AUPA monogram */}
+  <div class="relative z-[1] flex items-end justify-between gap-2">
+    {categoryLabel[category] ? (
+      <span class="uppercase tracking-[0.12em] font-semibold opacity-85" style={`font-size:${t.smallMono + 1}px;`}>
         {categoryLabel[category]}
       </span>
+    ) : (
+      <span aria-hidden="true">&nbsp;</span>
     )}
+    <span class="tracking-[0.18em] font-bold opacity-60 uppercase" style={`font-size:${t.smallMono}px;`}>
+      AUPA · AB
+    </span>
   </div>
 </div>

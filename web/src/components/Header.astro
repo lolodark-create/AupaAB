@@ -4,19 +4,28 @@
 import Logo from './Logo.astro';
 import Icon from './atoms/Icon.astro';
 
+// Nav was 5 items including a separate "À la une" home and "Actualités"
+// list. User flattened them: home IS the list now, so the surviving items
+// are the feed itself + category shortcuts + Sources.
 const navItems = [
-  { href: '/', label: 'À la une' },
-  { href: '/actu', label: 'Actualités' },
-  { href: '/actu?cat=match', label: 'Match' },
-  { href: '/actu?cat=mercato', label: 'Mercato' },
+  { href: '/', label: 'Actualités' },
+  { href: '/?cat=match', label: 'Match' },
+  { href: '/?cat=mercato', label: 'Mercato' },
   { href: '/sources', label: 'Sources' },
 ];
 
-const current = Astro.url.pathname;
-const isActive = (href: string) => {
-  const base = href.split('?')[0];
-  return current === base || (base !== '/' && current.startsWith(base));
-};
+const currentPath = Astro.url.pathname;
+const currentCat = Astro.url.searchParams.get('cat');
+
+// Active state has to consider both pathname AND ?cat= so the three home
+// links don't all light up at once. Sources is a separate path.
+function isActive(href: string) {
+  const u = new URL(href, 'http://_');
+  if (u.pathname !== currentPath) return false;
+  const targetCat = u.searchParams.get('cat');
+  // The bare "Actualités" link should only be active when no category is set
+  return targetCat === currentCat;
+}
 ---
 
 <header

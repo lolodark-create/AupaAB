@@ -3,10 +3,9 @@ import Logo from './Logo.astro';
 import Icon from './atoms/Icon.astro';
 
 const navItems = [
-  { href: '/', label: 'À la une', icon: 'home' as const },
-  { href: '/actu', label: 'Toutes les actualités', icon: 'newspaper' as const },
-  { href: '/actu?cat=match', label: 'Match', icon: 'calendar' as const },
-  { href: '/actu?cat=mercato', label: 'Mercato', icon: 'arrowRight' as const },
+  { href: '/', label: 'Actualités', icon: 'newspaper' as const },
+  { href: '/?cat=match', label: 'Match', icon: 'calendar' as const },
+  { href: '/?cat=mercato', label: 'Mercato', icon: 'arrowRight' as const },
   { href: '/sources', label: 'Sources', icon: 'users' as const },
 ];
 ---

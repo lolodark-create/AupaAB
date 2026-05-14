@@ -1,29 +1,55 @@
 ---
+// Home = actualités list. User feedback ("la home page peut être l'onglet
+// actualité, c'est plus straight to the point") collapsed the old "À la une"
+// editorial layout into the actual article feed. The MatchBanner stays as a
+// small fixture-summary above the list, but no more featured-hero card,
+// KPI strip, themed sections, or Tribune placeholder.
 import SiteShell from '~/layouts/SiteShell.astro';
 import MatchBanner from '~/components/MatchBanner.astro';
 import ArticleCard from '~/components/ArticleCard.astro';
-import TrendingList from '~/components/TrendingList.astro';
-import Icon from '~/components/atoms/Icon.astro';
-import { listArticles } from '~/lib/data';
-import { NEXT_MATCH, TRIBUNE } from '@shared/mock';
+import Button from '~/components/atoms/Button.astro';
+import { listArticles, listActiveSources } from '~/lib/data';
+import { NEXT_MATCH } from '@shared/mock';
+import type { ArticleCategory } from '@shared/types';
 
-// Pull a broad set in one query; Supabase view already filters takedowns + unpublished.
-const allArticles = await listArticles({ limit: 50 });
-const featured = allArticles[0];
-const leads = allArticles.slice(1, 4);
-const matchArticles = allArticles
-  .filter((a) => a.category === 'match' || a.slug.startsWith('billetterie') || a.slug.startsWith('patat'))
-  .slice(0, 3);
-const mercatoArticles = allArticles.filter((a) => a.category === 'mercato').slice(0, 3);
-const coulisses = allArticles.filter((a) => a.category === 'coulisses').slice(0, 3);
+const url = Astro.url;
+const cat = (url.searchParams.get('cat') ?? 'all') as ArticleCategory | 'all';
+const src = url.searchParams.get('src') ?? 'all';
+
+const allCats: Array<{ key: ArticleCategory | 'all'; label: string }> = [
+  { key: 'all', label: 'Tout' },
+  { key: 'match', label: 'Match' },
+  { key: 'mercato', label: 'Mercato' },
+  { key: 'coulisses', label: 'Coulisses' },
+  { key: 'espoirs', label: 'Espoirs' },
+  { key: 'pays_basque', label: 'Pays Basque' },
+  { key: 'autre', label: 'Autre' },
+];
+
+const articles = await listArticles({
+  cat: cat === 'all' ? undefined : cat,
+  src: src === 'all' ? undefined : src,
+  limit: 50,
+});
+
+const sourceList = await listActiveSources();
+
+// Build href preserving the OTHER filter
+const filterHref = (catKey: ArticleCategory | 'all') => {
+  const params = new URLSearchParams();
+  if (catKey !== 'all') params.set('cat', catKey);
+  if (src !== 'all') params.set('src', src);
+  const qs = params.toString();
+  return qs ? `/?${qs}` : '/';
+};
 ---
 
 <SiteShell
   title="AUPA AB"
-  description="Toute l'actualité de l'Aviron Bayonnais, agrégée, sans pub intrusive, en lecture longue. Non-officiel, fait par des supporters."
+  description="Toute l'actualité de l'Aviron Bayonnais, agrégée depuis les principaux médias, mise à jour toutes les 15 minutes."
 >
-  {/* Match banner */}
-  <div class="md:px-8 md:pt-6 max-w-container mx-auto">
+  <div class="max-w-container mx-auto px-4 md:px-8 pt-4 md:pt-6 pb-10 md:pb-20">
+    {/* Match banner */}
     <MatchBanner
       home={{ short: NEXT_MATCH.home.short, form: NEXT_MATCH.home.form }}
       away={{ short: NEXT_MATCH.away.short, form: NEXT_MATCH.away.form }}
@@ -33,247 +59,103 @@ const coulisses = allArticles.filter((a) => a.category === 'coulisses').slice(0,
       diffusion={NEXT_MATCH.diffusion}
       daysOut={NEXT_MATCH.daysOut}
     />
-  </div>
 
-  {/* Hero featured */}
-  {featured && (
-    <section class="px-4 py-6 md:px-8 md:py-10 max-w-container mx-auto">
-      <ArticleCard
-        variant="featured"
-        slug={featured.slug}
-        title={featured.title}
-        lede={featured.lede ?? featured.excerpt}
-        category={featured.category}
-        sourceSlug={featured.source.slug}
-        sourceName={featured.source.name}
-        timeLabel={featured.time_label}
-        dateLabel={featured.date_label}
-        readingMin={featured.reading_min}
-        commentCount={featured.comment_count}
-      />
-    </section>
-  )}
-
-  {/* KPI strip (desktop only) */}
-  <section class="hidden md:block px-8 pb-8 max-w-container mx-auto">
-    <div class="grid grid-cols-3 gap-6">
-      {[
-        { kpi: '412', label: 'Sources surveillées', note: 'parfois la même rumeur dans 12 médias.' },
-        { kpi: '3 247', label: 'Articles indexés', note: 'depuis le retour en Top 14.' },
-        { kpi: '15 min', label: 'Fréquence de scan', note: 'on dort un peu, quand même.' },
-      ].map((s) => (
-        <div class="px-6 py-5 bg-bg-elevated rounded-lg border border-border-subtle flex items-baseline gap-4">
-          <span class="font-serif font-semibold text-[44px] leading-none text-aviron shrink-0 tnum" style="font-variation-settings:'opsz' 120;">
-            {s.kpi}
-          </span>
-          <div>
-            <div class="font-semibold text-sm mb-0.5">{s.label}</div>
-            <div class="text-[12.5px] text-fg-secondary italic">{s.note}</div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  {/* À la une grid */}
-  <section class="px-4 py-10 md:px-8 md:py-16 max-w-container mx-auto">
-    <header class="flex items-baseline justify-between gap-4 mb-4 md:mb-6">
-      <div>
-        <span class="t-meta block mb-1 text-aviron">À la une</span>
-        <h2 class="m-0 font-serif font-semibold text-[26px] md:text-[34px] leading-[1.1] tracking-[-0.012em]" style="font-variation-settings:'opsz' 72, 'SOFT' 20;">
-          Ce qu'il faut lire ce matin
-        </h2>
-      </div>
-      <a href="/actu" class="text-[13px] font-medium text-aviron inline-flex items-center gap-1 whitespace-nowrap">
-        Tout voir <Icon name="arrowRight" size={14} />
-      </a>
+    {/* Page intro — minimal, just enough to anchor the feed */}
+    <header class="mt-8 md:mt-12 mb-5 md:mb-7">
+      <span class="t-meta text-aviron">Actualités</span>
+      <h1 class="mt-1 mb-2 font-serif font-semibold text-[32px] md:text-[48px] leading-[1.04] tracking-[-0.015em]" style="font-variation-settings:'opsz' 144, 'SOFT' 40; text-wrap:balance;">
+        L'Aviron Bayonnais, en continu
+      </h1>
+      <p class="m-0 text-[14.5px] md:text-[16.5px] text-fg-secondary max-w-reading">
+        Six médias surveillés, scannés toutes les 15 minutes. On regroupe les articles qui couvrent le même événement pour vous épargner les doublons.
+      </p>
     </header>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-      {leads.map((a) => (
-        <ArticleCard
-          variant="lead"
-          slug={a.slug}
-          title={a.title}
-          lede={a.lede ?? a.excerpt}
-          category={a.category}
-          sourceSlug={a.source.slug}
-          sourceName={a.source.name}
-          timeLabel={a.time_label}
-          dateLabel={a.date_label}
-          readingMin={a.reading_min}
-          commentCount={a.comment_count}
-        />
-      ))}
-    </div>
-  </section>
 
-  {/* Match + sidebar */}
-  <section class="px-4 md:px-8 pb-10 md:pb-14 max-w-container mx-auto">
-    <div class="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-10 md:gap-12">
-      <div>
-        <header class="mb-4 md:mb-6">
-          <span class="t-meta block mb-1 text-aviron">Avant-match</span>
-          <h2 class="m-0 font-serif font-semibold text-[26px] md:text-[34px] leading-[1.1] tracking-[-0.012em]" style="font-variation-settings:'opsz' 72, 'SOFT' 20;">
-            Tout pour samedi soir
-          </h2>
-        </header>
-        <div>
-          {matchArticles.map((a) => (
-            <ArticleCard
-              variant="row"
-              slug={a.slug}
-              title={a.title}
-              lede={a.lede ?? a.excerpt}
-              category={a.category}
-              sourceSlug={a.source.slug}
-              sourceName={a.source.name}
-              timeLabel={a.time_label}
-              dateLabel={a.date_label}
-              readingMin={a.reading_min}
-              commentCount={a.comment_count}
-            />
-          ))}
-        </div>
-
-        <header class="mt-8 md:mt-10 mb-4 md:mb-6">
-          <span class="t-meta block mb-1 text-aviron">Mercato</span>
-          <h2 class="m-0 font-serif font-semibold text-[26px] md:text-[34px] leading-[1.1] tracking-[-0.012em]" style="font-variation-settings:'opsz' 72, 'SOFT' 20;">
-            Qui part, qui reste, qui n'a jamais existé
-          </h2>
-        </header>
-        <div>
-          {mercatoArticles.map((a) => (
-            <ArticleCard
-              variant="row"
-              slug={a.slug}
-              title={a.title}
-              lede={a.lede ?? a.excerpt}
-              category={a.category}
-              sourceSlug={a.source.slug}
-              sourceName={a.source.name}
-              timeLabel={a.time_label}
-              dateLabel={a.date_label}
-              readingMin={a.reading_min}
-              commentCount={a.comment_count}
-            />
-          ))}
-        </div>
+    {/* Filters bar (sticky under header) */}
+    <form
+      method="get"
+      class="sticky top-14 md:top-[72px] z-10 -mx-4 md:-mx-8 px-4 md:px-8 py-3 bg-bg-default border-b border-border-subtle mb-4"
+      aria-label="Filtres des articles"
+    >
+      <div class="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Catégorie">
+        {allCats.map((c) => {
+          const isActive = c.key === cat;
+          return (
+            <a
+              href={filterHref(c.key)}
+              role="tab"
+              aria-selected={isActive ? 'true' : 'false'}
+              class:list={[
+                'px-3.5 py-2 text-[13px] font-medium whitespace-nowrap rounded-full transition-colors',
+                isActive
+                  ? 'bg-fg text-bg-default border border-fg'
+                  : 'border border-border-subtle text-fg-secondary hover:text-fg',
+              ]}
+            >
+              {c.label}
+            </a>
+          );
+        })}
       </div>
-
-      <div class="hidden md:flex flex-col gap-8" aria-label="Le plus lu et brief">
-        <div class="p-6 bg-bg-elevated border border-border-subtle rounded-lg">
-          <TrendingList />
-        </div>
-        <div class="p-7 rounded-lg relative overflow-hidden text-white" style="background: rgb(11 37 69);">
-          <span class="t-meta" style="color:#3FB0E5;">Le brief du matin</span>
-          <h3 class="m-0 mt-2.5 mb-3 font-serif font-semibold text-[22px] leading-[1.15]" style="text-wrap:balance; font-variation-settings:'opsz' 60, 'SOFT' 30;">
-            Tout l'AB dans votre boîte mail, à 8h. Sans bla-bla.
-          </h3>
-          <p class="m-0 mb-4 text-[13.5px] leading-relaxed opacity-70">
-            3 articles, 1 stat, 1 phrase d'humeur. On a fait court exprès. <em>(Disponible en V1.5.)</em>
-          </p>
-          <p class="m-0 text-[10.5px] opacity-50">
-            Désabonnement en 1 clic. RGPD. Pas de spam (on a horreur de ça).
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {/* Coulisses */}
-  <section class="bg-bg-subtle px-4 md:px-8">
-    <div class="max-w-container mx-auto py-6 md:py-10">
-      <header class="flex items-baseline justify-between gap-4 mb-4 md:mb-6">
-        <div>
-          <span class="t-meta block mb-1 text-aviron">Coulisses</span>
-          <h2 class="m-0 font-serif font-semibold text-[26px] md:text-[34px] leading-[1.1] tracking-[-0.012em]" style="font-variation-settings:'opsz' 72, 'SOFT' 20;">
-            Ce qui se dit, ce qui se chuchote
-          </h2>
-        </div>
-        <a href="/actu?cat=coulisses" class="text-[13px] font-medium text-aviron inline-flex items-center gap-1 whitespace-nowrap">
-          Plus de coulisses <Icon name="arrowRight" size={14} />
-        </a>
-      </header>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-6">
-        {coulisses.map((a) => (
-          <Fragment>
-            <ArticleCard
-              variant="row"
-              class="md:hidden"
-              slug={a.slug}
-              title={a.title}
-              lede={a.lede ?? a.excerpt}
-              category={a.category}
-              sourceSlug={a.source.slug}
-              sourceName={a.source.name}
-              timeLabel={a.time_label}
-              dateLabel={a.date_label}
-              readingMin={a.reading_min}
-              commentCount={a.comment_count}
-            />
-            <div class="hidden md:block">
-              <ArticleCard
-                variant="lead"
-                slug={a.slug}
-                title={a.title}
-                lede={a.lede ?? a.excerpt}
-                category={a.category}
-                sourceSlug={a.source.slug}
-                sourceName={a.source.name}
-                timeLabel={a.time_label}
-                dateLabel={a.date_label}
-                readingMin={a.reading_min}
-                commentCount={a.comment_count}
-              />
-            </div>
-          </Fragment>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  {/* Tribune (mock visuel V1, contenu réel en V2) */}
-  <section class="px-4 py-8 md:px-8 md:py-16 max-w-container mx-auto">
-    <header class="flex items-baseline justify-between mb-6">
-      <div>
-        <span class="t-meta text-aviron">Tribune AUPA AB</span>
-        <h2 class="mt-1 mb-0 font-serif font-semibold text-[26px] md:text-[34px] leading-[1.1] tracking-[-0.012em]" style="font-variation-settings:'opsz' 72;">
-          Vu de la Sud, par les supporters
-        </h2>
-        <p class="mt-2 text-[13px] text-fg-tertiary italic">
-          Section communautaire ouverte en V2. Pour l'instant : aperçu.
-        </p>
-      </div>
-    </header>
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
-      {TRIBUNE.map((t, i) => {
-        const gradients = [
-          'linear-gradient(135deg, #0B2545 0%, #0099D8 100%)',
-          'linear-gradient(160deg, #EFEAE0 0%, #CFCAB8 100%)',
-          'linear-gradient(180deg, #1A1D24 0%, #0B2545 100%)',
-        ];
-        return (
-          <div
-            class:list={['relative aspect-[4/5] rounded-lg overflow-hidden text-white', i === 2 ? 'hidden md:block' : '']}
-            style={`background:${gradients[i]}`}
+      <div class="hidden md:flex gap-3 mt-3 items-center">
+        <label class="text-[13px] text-fg-secondary">
+          Source
+          <select
+            name="src"
+            class="ml-2 px-3 py-1.5 text-[13px] bg-bg-elevated border border-border-subtle rounded-md text-fg"
+            onchange="this.form.submit()"
           >
-            <div class="absolute inset-0" style="background: linear-gradient(180deg, transparent 50%, rgba(11,37,69,0.85));"></div>
-            <div class="absolute left-4 right-4 bottom-4">
-              <div class="text-[11px] opacity-85 mb-1 tracking-[0.04em]">{t.author}</div>
-              <div class="font-serif font-medium text-[15px] leading-[1.25]" style="font-variation-settings:'opsz' 48;">{t.caption}</div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  </section>
+            <option value="all">Toutes les sources</option>
+            {sourceList.map((s) => (
+              <option value={s.slug} selected={src === s.slug}>{s.name}</option>
+            ))}
+          </select>
+        </label>
+        {cat !== 'all' && <input type="hidden" name="cat" value={cat} />}
+        <span class="ml-auto text-[12.5px] text-fg-secondary tnum">
+          {articles.length} article{articles.length > 1 ? 's' : ''}
+        </span>
+      </div>
+    </form>
 
-  {/* Non-officiel pinned reminder */}
-  <section class="px-4 md:px-8 mt-4">
-    <div class="max-w-reading mx-auto py-6 border-t border-b border-border-subtle text-center">
-      <p class="m-0 text-[13px] text-fg-tertiary">
-        <strong class="text-fg-secondary">Site non-officiel.</strong> AUPA AB n'a aucun lien juridique avec l'Aviron Bayonnais. Les articles sont des extraits courts (≤350 caractères) avec lien sortant vers la source originale. Vous êtes éditeur et souhaitez un retrait ? <a href="/contact-retrait" class="text-aviron underline">Écrivez-nous</a>.
+    {/* Article list */}
+    <div>
+      {articles.length === 0 ? (
+        <p class="py-16 text-center text-fg-secondary">
+          Aucun article ne correspond à ces filtres. <a href="/" class="text-aviron underline">Réinitialiser</a>.
+        </p>
+      ) : (
+        articles.map((a) => (
+          <ArticleCard
+            variant="row"
+            slug={a.slug}
+            title={a.title}
+            lede={a.lede ?? a.excerpt}
+            category={a.category}
+            sourceSlug={a.source.slug}
+            sourceName={a.source.name}
+            timeLabel={a.time_label}
+            dateLabel={a.date_label}
+            readingMin={a.reading_min}
+            commentCount={a.comment_count}
+          />
+        ))
+      )}
+    </div>
+
+    {articles.length >= 50 && (
+      <div class="mt-10 flex justify-center">
+        <Button variant="secondary" size="lg" iconRight="arrowRight">
+          Charger plus d'articles
+        </Button>
+      </div>
+    )}
+
+    {/* Non-officiel pinned reminder */}
+    <div class="mt-14 md:mt-20 pt-6 border-t border-border-subtle">
+      <p class="m-0 text-[12.5px] text-fg-tertiary text-center max-w-reading mx-auto leading-relaxed">
+        <strong class="text-fg-secondary">Site non-officiel.</strong> AUPA AB n'a aucun lien juridique avec l'Aviron Bayonnais. Les articles sont des extraits courts (≤ 350 caractères) avec lien sortant vers la source originale. Vous êtes éditeur et souhaitez un retrait&nbsp;? <a href="/contact-retrait" class="text-aviron underline">Écrivez-nous</a>.
       </p>
     </div>
-  </section>
+  </div>
 </SiteShell>
