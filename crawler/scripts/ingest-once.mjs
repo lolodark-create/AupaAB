@@ -28,50 +28,63 @@ function removeAccents(s) {
   return s.normalize('NFD').replace(/[̀-ͯ]/g, '');
 }
 
-// STRONG signals = direct club identity. Any one of these → accept.
-const STRONG_KEYWORDS = [
+// Title-based relevance. Empirically the highest precision: the title is the
+// editorial promise of the article. If AB isn't named there, the piece is
+// almost always off-topic (Section Paloise mentioning Gorgadze's absence, BO
+// match previews quoting AB stats, etc.).
+
+const STRONG_PHRASES = [
   'aviron bayonnais', 'aviron bayonne', "l'aviron", 'ab rugby',
   'aupa ab', 'aupa, ab', 'ciel et blanc',
   'jean dauger', 'stade de bayonne',
 ];
-// WEAK signals = player/coach names. Common enough to false-positive on opposing
-// teams ("Pau prive Gorgadze de Clermont") so we require 'bayonne' OR 'aviron'
-// to also appear somewhere in the haystack.
-const WEAK_KEYWORDS = [
-  'edwin maka', 'camille lopez', 'beka gorgadze', 'manu tuilagi',
-  'gregory patat', 'jean baptiste aldige', 'jean-baptiste aldige',
-  'tana umaga', 'spedding', 'mike spedding',
+
+// AB roster surnames (May 2026). Keep maintained per mercato cycle.
+const AB_NAMES = [
+  'maka', 'lopez', 'gorgadze', 'tuilagi', 'spedding', 'umaga',
+  'patat', 'aldige', 'heguy', 'capilla', 'segonds', 'tatafu',
+  'erbinartegaray', 'moretti', 'bruni',
 ];
-// 'Bayonne' alone is too broad (city). Need rugby co-occurrence.
-const BAYONNE_RUGBY_CO = ['rugby', 'top 14', 'pro d2', 'maillot', 'tribune', 'mêlée', 'melee', 'aviron'];
+
+// If the title names another Top 14 / Pro D2 club, the article is almost
+// certainly about that club — even if it mentions an AB player tangentially.
+// Reject UNLESS the title also has "bayonne" or "aviron" (comparison piece).
+const OTHER_CLUB_REJECT = [
+  'section paloise', 'biarritz olympique', 'stade toulousain', 'stade rochelais',
+  'racing 92', 'stade francais', 'castres olympique', 'asm clermont',
+  'usa perpignan', 'rc toulon', 'lyon ou', 'montpellier hr', 'union bordeaux',
+  'oyonnax rugby', 'us montauban', 'colomiers rugby', 'soyaux angouleme',
+  'beziers rugby', 'agen rugby', 'mont de marsan', 'nevers rugby',
+  'grenoble fcg', 'aurillac rugby', 'provence rugby', 'rouen normandie',
+  'biarritz - ', 'biarritz–', 'bo - ', 'bo–',
+];
 
 function isRelevantToAB(item) {
-  const hay = [item.title, item.contentSnippet, item.content, item.description, (item.categories || []).join(' ')]
-    .filter(Boolean).join(' ');
-  if (!hay.trim()) return false;
-  const n = removeAccents(hay.toLowerCase()).replace(/[-_]+/g, ' ');
+  const raw = item.title || '';
+  if (!raw.trim()) return false;
+  const t = removeAccents(raw.toLowerCase()).replace(/[-_]+/g, ' ');
 
-  // 1. Strong match: direct club reference
-  for (const kw of STRONG_KEYWORDS) {
-    if (n.includes(removeAccents(kw).replace(/[-_]+/g, ' '))) return true;
-  }
+  const hasAvironOrBayonne = /\b(bayonne|aviron)\b/.test(t);
 
-  const hasContext = n.includes('bayonne') || n.includes('aviron');
-
-  // 2. Weak match (player name) requires bayonne/aviron context
-  if (hasContext) {
-    for (const kw of WEAK_KEYWORDS) {
-      if (n.includes(removeAccents(kw).replace(/[-_]+/g, ' '))) return true;
+  // Reject: title clearly names another club AND has no AB anchor
+  for (const club of OTHER_CLUB_REJECT) {
+    if (t.includes(removeAccents(club).replace(/[-_]+/g, ' ')) && !hasAvironOrBayonne) {
+      return false;
     }
   }
 
-  // 3. Bayonne + rugby term = also OK (covers "AB" abbrev + generic match coverage)
-  if (n.includes('bayonne')) {
-    for (const co of BAYONNE_RUGBY_CO) {
-      if (n.includes(removeAccents(co))) return true;
-    }
+  // 1. Direct club reference in title (strongest signal)
+  for (const kw of STRONG_PHRASES) {
+    if (t.includes(removeAccents(kw).replace(/[-_]+/g, ' '))) return true;
   }
-
+  // 2. "bayonne" as a standalone word in title
+  if (/\bbayonne\b/.test(t)) return true;
+  // 3. "AB" as a case-sensitive standalone token (rare but explicit)
+  if (/\bAB\b/.test(raw)) return true;
+  // 4. AB roster surname in title (only counts if no opposing club is named)
+  for (const n of AB_NAMES) {
+    if (new RegExp(`\\b${n}\\b`, 'i').test(t)) return true;
+  }
   return false;
 }
 
