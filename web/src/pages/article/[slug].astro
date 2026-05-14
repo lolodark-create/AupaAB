@@ -1,7 +1,7 @@
 ---
 import SiteShell from '~/layouts/SiteShell.astro';
 import ArticleCard from '~/components/ArticleCard.astro';
-import EditorialThumb from '~/components/EditorialThumb.astro';
+import ArticleThumb from '~/components/ArticleThumb.astro';
 import Badge from '~/components/atoms/Badge.astro';
 import Button from '~/components/atoms/Button.astro';
 import SourceChip from '~/components/atoms/SourceChip.astro';
@@ -121,15 +121,16 @@ const related = allRelated.filter((a) => a.slug !== article.slug).slice(0, 3);
         </div>
       </div>
 
-      {/* Editorial cover */}
+      {/* Cover — real source image if available, brand chip fallback. */}
       <div class="rounded-lg overflow-hidden mb-8 aspect-video">
-        <EditorialThumb
+        <ArticleThumb
           id={article.slug}
           title={article.title}
           category={article.category}
           dateLabel={article.date_label}
           sourceSlug={article.source.slug}
           sourceName={article.source.name}
+          coverImageUrl={article.cover_image_url}
           size="lg"
         />
       </div>
@@ -214,6 +215,7 @@ const related = allRelated.filter((a) => a.slug !== article.slug).slice(0, 3);
               dateLabel={a.date_label}
               readingMin={a.reading_min}
               commentCount={a.comment_count}
+              coverImageUrl={a.cover_image_url}
             />
           ))}
         </div>

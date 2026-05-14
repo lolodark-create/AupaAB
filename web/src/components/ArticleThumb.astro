@@ -1,0 +1,54 @@
+---
+// Article thumbnail: real source image when available, source-brand chip
+// fallback otherwise.
+//
+// We hot-link the image from the source CDN (Sud Ouest, Midol, Rugbyrama…)
+// rather than rehosting — bandwidth stays with the source, which is the
+// standard aggregator-friendly behavior. If the image fails to load (404,
+// CDN block, slow server, etc.), the EditorialThumb chip is already
+// rendered behind it via absolute positioning, so the user always sees
+// something.
+//
+// referrerpolicy="no-referrer" prevents leaking the AUPA domain to the
+// source server in the Referer header — privacy hygiene, and avoids some
+// hot-link blockers that key on referrer.
+//
+// loading="lazy" defers off-screen images and keeps the LCP fast.
+import EditorialThumb from './EditorialThumb.astro';
+import type { ArticleCategory } from '@shared/types';
+
+type Size = 'xs' | 'sm' | 'md' | 'lg';
+
+interface Props {
+  id: string;
+  title: string;
+  category: ArticleCategory;
+  dateLabel?: string;
+  sourceSlug: string;
+  sourceName: string;
+  coverImageUrl?: string | null;
+  size?: Size;
+  class?: string;
+}
+
+const { coverImageUrl, ...rest } = Astro.props;
+---
+
+<div class:list={['relative w-full h-full overflow-hidden', rest.class]}>
+  {/* Chip fallback rendered first so the image overlays it. If the image
+      fails to load the onerror handler hides the <img>, exposing the chip. */}
+  <div class="absolute inset-0">
+    <EditorialThumb {...rest} />
+  </div>
+  {coverImageUrl && (
+    <img
+      src={coverImageUrl}
+      alt={`Photo illustrant : ${rest.title}`}
+      loading="lazy"
+      decoding="async"
+      referrerpolicy="no-referrer"
+      class="relative w-full h-full object-cover"
+      onerror="this.style.display='none'"
+    />
+  )}
+</div>

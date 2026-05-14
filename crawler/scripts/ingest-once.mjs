@@ -133,12 +133,84 @@ function generateSlug(title) {
   return `${t || 'article'}-${makeSuffix()}`;
 }
 
+// Find a usable cover image URL for an article. Tries in order of cost:
+//   1. <media:content url="…"> — Media RSS spec, used by Midol
+//   2. <media:thumbnail url="…"> — Media RSS variant
+//   3. <enclosure url="…" type="image/…"> — RSS 2.0 standard
+//   4. First <img src="…"> in content/description HTML
+//   5. og:image / twitter:image from the article's HTML head (extra HTTP
+//      request) — needed for sources like Sud Ouest that ship bare RSS.
+// We hot-link the URL from the source CDN; no rehost on AUPA.
+function extractFromRss(item) {
+  const mc = item.mediaContent;
+  if (Array.isArray(mc) && mc[0]) {
+    const u = mc[0].$?.url || mc[0].url;
+    if (u) return u;
+  }
+  const mt = item.mediaThumbnail;
+  if (Array.isArray(mt) && mt[0]) {
+    const u = mt[0].$?.url || mt[0].url;
+    if (u) return u;
+  }
+  if (item.enclosure?.url && /^image\//.test(item.enclosure.type || '')) {
+    return item.enclosure.url;
+  }
+  const html = item['content:encoded'] || item.content || item.description || '';
+  const m = String(html).match(/<img[^>]+src=["']([^"']+)["']/i);
+  if (m && /^https?:\/\//.test(m[1])) return m[1];
+  return null;
+}
+
+async function fetchOgImage(articleUrl) {
+  try {
+    const res = await fetch(articleUrl, {
+      headers: {
+        'User-Agent': 'AUPA-AB-Crawler/0.1 (+https://aupa-ab.com/sources)',
+        Accept: 'text/html,application/xhtml+xml',
+      },
+      signal: AbortSignal.timeout(8000),
+      redirect: 'follow',
+    });
+    if (!res.ok) return null;
+    // Read just the head — most og: tags are in the first 30KB. Streaming
+    // would be cleaner but the fetch API doesn't expose a true streaming
+    // text reader cross-runtime, so cap by content length.
+    const html = (await res.text()).slice(0, 30_000);
+    const og =
+      html.match(/<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["']/i) ||
+      html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::secure_url)?["']/i) ||
+      html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
+    if (!og) return null;
+    let url = og[1];
+    // Normalize protocol-relative + relative URLs against the article
+    if (url.startsWith('//')) url = 'https:' + url;
+    else if (url.startsWith('/')) {
+      const u = new URL(articleUrl);
+      url = `${u.protocol}//${u.host}${url}`;
+    }
+    return /^https?:\/\//.test(url) ? url : null;
+  } catch {
+    return null;
+  }
+}
+
+async function extractCoverImage(item) {
+  return extractFromRss(item) || (await fetchOgImage(item.link));
+}
+
 // ─── DB ──────────────────────────────────────────────────────────────────────
 const sql = postgres(DATABASE_URL, { ssl: 'require', max: 2, prepare: false });
 
 const parser = new Parser({
   headers: { 'User-Agent': 'AUPA-AB-Crawler/0.1 (+https://aupa-ab.com/sources)' },
   timeout: FEED_TIMEOUT_MS,
+  customFields: {
+    item: [
+      ['media:content', 'mediaContent', { keepArray: true }],
+      ['media:thumbnail', 'mediaThumbnail', { keepArray: true }],
+      ['content:encoded', 'content:encoded'],
+    ],
+  },
 });
 
 // ─── Run ─────────────────────────────────────────────────────────────────────
@@ -180,11 +252,13 @@ for (const source of sources) {
     const excerpt = generateExcerpt(item);
     if (!excerpt) continue;
 
+    const coverImage = await extractCoverImage(item);
+
     try {
       const result = await sql`
         insert into public.articles (
           slug, title, source_id, source_url, excerpt, author, published_at,
-          category, tags, reading_time_sec
+          category, tags, reading_time_sec, cover_image_url
         ) values (
           ${generateSlug(item.title)},
           ${item.title.trim()},
@@ -195,7 +269,8 @@ for (const source of sources) {
           ${item.isoDate || item.pubDate || new Date().toISOString()},
           ${classifyArticle(item.title, item.contentSnippet)},
           ${[]},
-          ${Math.max(60, Math.round(((item.contentSnippet || '').split(/\s+/).length / 230) * 60))}
+          ${Math.max(60, Math.round(((item.contentSnippet || '').split(/\s+/).length / 230) * 60))},
+          ${coverImage}
         )
         on conflict (source_url) do nothing
         returning id

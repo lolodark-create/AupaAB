@@ -3,7 +3,7 @@
 import Badge from './atoms/Badge.astro';
 import SourceChip from './atoms/SourceChip.astro';
 import Icon from './atoms/Icon.astro';
-import EditorialThumb from './EditorialThumb.astro';
+import ArticleThumb from './ArticleThumb.astro';
 import { getSourceMeta } from '~/lib/sources';
 import type { ArticleCategory } from '@shared/types';
 
@@ -21,6 +21,7 @@ interface Props {
   dateLabel?: string;
   readingMin: number;
   commentCount: number;
+  coverImageUrl?: string | null;
   class?: string;
 }
 
@@ -36,6 +37,7 @@ const {
   dateLabel,
   readingMin,
   commentCount,
+  coverImageUrl,
   class: className,
 } = Astro.props;
 
@@ -57,7 +59,7 @@ const categoryLabel: Record<ArticleCategory, string> = {
 {variant === 'featured' && (
   <article class:list={['group bg-bg-elevated rounded-lg overflow-hidden border border-border-subtle transition-shadow hover:shadow-md grid md:grid-cols-[1.4fr_1fr]', className]}>
     <a href={href} class="block aspect-[16/10] md:h-[460px] focus-visible:outline-none">
-      <EditorialThumb id={slug} title={title} category={category} sourceSlug={sourceSlug} sourceName={sourceName} dateLabel={dateLabel} size="lg" />
+      <ArticleThumb id={slug} title={title} category={category} sourceSlug={sourceSlug} sourceName={sourceName} dateLabel={dateLabel} coverImageUrl={coverImageUrl} size="lg" />
     </a>
     <div class="p-6 md:p-10 flex flex-col justify-center gap-4">
       <div class="flex items-center gap-3 flex-wrap">
@@ -88,7 +90,7 @@ const categoryLabel: Record<ArticleCategory, string> = {
 {variant === 'lead' && (
   <article class:list={['group bg-bg-elevated rounded-lg overflow-hidden border border-border-subtle h-full flex flex-col transition-all hover:-translate-y-0.5 hover:shadow-md', className]}>
     <a href={href} class="block aspect-[4/3] focus-visible:outline-none">
-      <EditorialThumb id={slug} title={title} category={category} sourceSlug={sourceSlug} sourceName={sourceName} dateLabel={dateLabel} size="md" />
+      <ArticleThumb id={slug} title={title} category={category} sourceSlug={sourceSlug} sourceName={sourceName} dateLabel={dateLabel} coverImageUrl={coverImageUrl} size="md" />
     </a>
     <div class="p-5 flex flex-col gap-2.5 flex-1">
       <div class="flex gap-2.5 items-center flex-wrap">
@@ -119,7 +121,7 @@ const categoryLabel: Record<ArticleCategory, string> = {
 {variant === 'compact' && (
   <a href={href} class:list={['flex gap-3 p-2 rounded-md hover:bg-bg-subtle transition-colors', className]}>
     <span class="block w-20 h-20 shrink-0 rounded-sm overflow-hidden">
-      <EditorialThumb id={slug} title={title} category={category} sourceSlug={sourceSlug} sourceName={sourceName} size="xs" />
+      <ArticleThumb id={slug} title={title} category={category} sourceSlug={sourceSlug} sourceName={sourceName} coverImageUrl={coverImageUrl} size="xs" />
     </span>
     <span class="flex flex-col gap-1 min-w-0 flex-1">
       <span class="t-meta text-[10.5px]">{categoryLabel[category]}</span>
@@ -133,7 +135,7 @@ const categoryLabel: Record<ArticleCategory, string> = {
 {variant === 'row' && (
   <article class:list={['group flex gap-4 md:gap-6 py-4 md:py-5 border-b border-border-subtle', className]}>
     <a href={href} class="block w-24 h-24 md:w-[220px] md:h-[146px] shrink-0 rounded-md overflow-hidden focus-visible:outline-none">
-      <EditorialThumb id={slug} title={title} category={category} sourceSlug={sourceSlug} sourceName={sourceName} dateLabel={dateLabel} size="sm" />
+      <ArticleThumb id={slug} title={title} category={category} sourceSlug={sourceSlug} sourceName={sourceName} dateLabel={dateLabel} coverImageUrl={coverImageUrl} size="sm" />
     </a>
     <div class="flex-1 flex flex-col gap-1.5 md:gap-2 min-w-0">
       <div class="flex gap-2.5 items-center flex-wrap">
