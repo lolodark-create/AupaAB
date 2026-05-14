@@ -3,13 +3,17 @@
 //
 // Was: title rendered as large type on a colored card. Problem: every
 // ArticleCard variant ALSO renders the title as <h2>, so the visible title
-// appeared twice per card — pure noise. Now: a typographic source-brand chip
-// (large monogram, category, date, decorative motif) with NO title text. The
-// card body owns the title.
+// appeared twice per card. Now: a typographic source-brand chip with NO
+// title text — the card body owns the title.
 //
-// Variant background is tied to the SOURCE brand color, so a reader can spot
-// "this is a Sud Ouest piece" at a glance — same skim cue as a physical
-// magazine using a publisher's masthead color.
+// Density adapts to size:
+//   xs / sm  → minimalist (brand color + big monogram only). At ≤220 px
+//              the date/source/category strips don't fit gracefully — text
+//              wraps onto two or three lines and looks broken. The card
+//              body already carries that metadata, so we drop it here.
+//   md / lg  → rich layout (top strip with source name + date, big center
+//              monogram, bottom strip with category + AUPA · AB). The
+//              ≥280 px thumb has enough width for the strips to read.
 import { getSourceMeta } from '~/lib/sources';
 import type { ArticleCategory } from '@shared/types';
 
@@ -17,7 +21,7 @@ type Size = 'xs' | 'sm' | 'md' | 'lg';
 
 interface Props {
   id: string;
-  title: string; // kept for aria-label only — never rendered as visible text
+  title: string; // aria-label only — never rendered as visible text
   category: ArticleCategory;
   dateLabel?: string;
   sourceSlug: string;
@@ -29,29 +33,28 @@ interface Props {
 const { id, title, category, dateLabel, sourceSlug, sourceName, size = 'md', class: className } = Astro.props;
 const meta = getSourceMeta(sourceSlug);
 
-// Size scale. monoFont drives the LARGE typographic mark in the center —
-// that's the visual identity now that the title is gone.
 const tokens: Record<Size, {
   padding: number;
-  smallMono: number;  // top + bottom strip text
-  bigMono: number;    // centerpiece source mono
+  smallMono: number;
+  bigMono: number;
 }> = {
-  xs: { padding: 8,  smallMono: 8,  bigMono: 22 },
-  sm: { padding: 14, smallMono: 9,  bigMono: 44 },
+  xs: { padding: 6,  smallMono: 8,  bigMono: 26 },
+  sm: { padding: 10, smallMono: 9,  bigMono: 38 },
   md: { padding: 20, smallMono: 10, bigMono: 72 },
   lg: { padding: 28, smallMono: 11, bigMono: 120 },
 };
 const t = tokens[size];
 
 const isHero = size === 'lg';
+const isMinimal = size === 'xs' || size === 'sm';
+
 const padStyle = isHero ? 'padding: clamp(20px, 3vw, 36px)' : `padding: ${t.padding}px`;
 const bigMonoSize = isHero
   ? 'font-size: clamp(64px, 11vw, 120px)'
-  : `font-size: ${t.bigMono}px`;
+  : isMinimal
+    ? `font-size: clamp(${t.bigMono - 6}px, 12vw, ${t.bigMono + 6}px)`
+    : `font-size: ${t.bigMono}px`;
 
-// Source brand color drives the whole card. We darken slightly for the bg so
-// the white type stays above WCAG AA against it. Each color in lib/sources is
-// already ≥ 5:1 for white type, so use as-is.
 const bg = meta.color;
 const fg = '#FAFAF7';
 const filFG = '#FFFFFF';
@@ -65,10 +68,6 @@ const categoryLabel: Record<ArticleCategory, string> = {
   autre: '',
 };
 
-// Each category gets its own filigree motif — geometric for match, arrows
-// for mercato, dots for espoirs, wave for pays_basque, lines for coulisses.
-// Decorative only (aria-hidden), provides visual variety so the grid of
-// cards isn't a wall of identical brand chips.
 type MotifKind = 'rugby' | 'arrows' | 'dots' | 'wave' | 'lines' | 'lauburu';
 const motifFor: Record<ArticleCategory, MotifKind> = {
   match: 'rugby',
@@ -82,25 +81,25 @@ const motif = motifFor[category];
 ---
 
 <div
-  class:list={['relative w-full h-full overflow-hidden flex flex-col justify-between', className]}
+  class:list={['relative w-full h-full overflow-hidden flex flex-col justify-center items-center', className]}
   style={`background:${bg}; color:${fg}; ${padStyle};`}
   role="img"
   aria-label={`${title} — vignette ${sourceName}`}
 >
-  {/* Decorative motif, varies by category */}
+  {/* Decorative motif, varies by category — purely visual variety */}
   {motif === 'rugby' && (
-    <svg class="absolute -right-[10%] top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none" width="120%" height="120%" viewBox="0 0 100 100" aria-hidden="true">
-      <ellipse cx="50" cy="50" rx="38" ry="22" fill="none" stroke={filFG} stroke-width="0.6" transform="rotate(-22 50 50)" />
-      <ellipse cx="50" cy="50" rx="38" ry="22" fill="none" stroke={filFG} stroke-width="0.6" transform="rotate(22 50 50)" />
-      <line x1="20" y1="50" x2="80" y2="50" stroke={filFG} stroke-width="0.6" />
-      <line x1="35" y1="46" x2="35" y2="54" stroke={filFG} stroke-width="0.6" />
-      <line x1="45" y1="46" x2="45" y2="54" stroke={filFG} stroke-width="0.6" />
-      <line x1="55" y1="46" x2="55" y2="54" stroke={filFG} stroke-width="0.6" />
-      <line x1="65" y1="46" x2="65" y2="54" stroke={filFG} stroke-width="0.6" />
+    <svg class="absolute -right-[10%] top-1/2 -translate-y-1/2 opacity-[0.10] pointer-events-none" width="120%" height="120%" viewBox="0 0 100 100" aria-hidden="true">
+      <ellipse cx="50" cy="50" rx="38" ry="22" fill="none" stroke={filFG} stroke-width="0.7" transform="rotate(-22 50 50)" />
+      <ellipse cx="50" cy="50" rx="38" ry="22" fill="none" stroke={filFG} stroke-width="0.7" transform="rotate(22 50 50)" />
+      <line x1="20" y1="50" x2="80" y2="50" stroke={filFG} stroke-width="0.7" />
+      <line x1="35" y1="46" x2="35" y2="54" stroke={filFG} stroke-width="0.7" />
+      <line x1="45" y1="46" x2="45" y2="54" stroke={filFG} stroke-width="0.7" />
+      <line x1="55" y1="46" x2="55" y2="54" stroke={filFG} stroke-width="0.7" />
+      <line x1="65" y1="46" x2="65" y2="54" stroke={filFG} stroke-width="0.7" />
     </svg>
   )}
   {motif === 'arrows' && (
-    <svg class="absolute inset-0 opacity-[0.09] pointer-events-none" width="100%" height="100%" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <svg class="absolute inset-0 opacity-[0.11] pointer-events-none" width="100%" height="100%" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       {Array.from({ length: 5 }).map((_, i) => (
         <g transform={`translate(${i * 50 - 20} ${i * 30 - 30})`}>
           <path d={`M0 80 L60 80 M50 75 L60 80 L50 85`} stroke={filFG} stroke-width="1.5" fill="none" stroke-linecap="round" />
@@ -109,7 +108,7 @@ const motif = motifFor[category];
     </svg>
   )}
   {motif === 'dots' && (
-    <svg class="absolute inset-0 opacity-[0.10] pointer-events-none" width="100%" height="100%" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <svg class="absolute inset-0 opacity-[0.12] pointer-events-none" width="100%" height="100%" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       {Array.from({ length: 6 }).flatMap((_, r) =>
         Array.from({ length: 8 }).map((_, c) => (
           <circle cx={c * 30 + 15} cy={r * 32 + 16} r={c % 2 === 0 ? 2 : 3} fill={filFG} />
@@ -118,20 +117,20 @@ const motif = motifFor[category];
     </svg>
   )}
   {motif === 'wave' && (
-    <svg class="absolute inset-0 opacity-[0.14] pointer-events-none" width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true">
+    <svg class="absolute inset-0 opacity-[0.16] pointer-events-none" width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true">
       <path d="M0 110 Q 50 70, 100 110 T 200 110 T 300 110 T 400 110 V 200 H 0 Z" fill={filFG} />
       <path d="M0 140 Q 50 110, 100 140 T 200 140 T 300 140 T 400 140 V 200 H 0 Z" fill={filFG} opacity="0.5" />
     </svg>
   )}
   {motif === 'lines' && (
-    <svg class="absolute inset-0 opacity-[0.08] pointer-events-none" width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true">
+    <svg class="absolute inset-0 opacity-[0.09] pointer-events-none" width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true">
       {Array.from({ length: 6 }).map((_, i) => (
         <line x1={i * 80} y1="0" x2={i * 80 - 120} y2="200" stroke={filFG} stroke-width="24" />
       ))}
     </svg>
   )}
   {motif === 'lauburu' && (
-    <svg class="absolute -right-[10%] top-1/2 -translate-y-1/2 opacity-[0.07] pointer-events-none" width="120%" height="120%" viewBox="0 0 100 100" aria-hidden="true">
+    <svg class="absolute -right-[10%] top-1/2 -translate-y-1/2 opacity-[0.09] pointer-events-none" width="120%" height="120%" viewBox="0 0 100 100" aria-hidden="true">
       <g stroke={filFG} fill="none" stroke-width="0.7">
         <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" />
         <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="rotate(90 50 50)" />
@@ -141,46 +140,60 @@ const motif = motifFor[category];
     </svg>
   )}
 
-  {/* Top: source name + date */}
-  <div class="relative z-[1] flex items-center justify-between">
-    <span class="uppercase font-semibold tracking-[0.12em] opacity-[0.85]" style={`font-size:${t.smallMono + 1}px;`}>
-      {sourceName}
-    </span>
-    {size !== 'xs' && dateLabel && (
-      <span class="uppercase tracking-[0.08em] font-medium opacity-70" style={`font-size:${t.smallMono + 1}px;`}>
-        {dateLabel}
-      </span>
-    )}
-  </div>
-
-  {/* Center: large source monogram. This is the visual identity now —
-      same energy as a magazine's masthead. No title text means no
-      duplication with the <h2> in the card body. */}
-  <div class="relative z-[1] flex-1 flex items-center justify-center">
+  {isMinimal ? (
+    /* Compact layout (xs/sm): big centered monogram only. No text strips —
+       at this width "SUD OUEST" + "13 MAI 2026" wrap onto multiple lines
+       and look broken. The card body already shows source name and date. */
     <span
-      class="font-serif font-semibold leading-none"
+      class="relative z-[1] font-serif font-semibold leading-none"
       aria-hidden="true"
       style={`color:${fg};
         ${bigMonoSize};
         letter-spacing:-0.04em;
-        font-variation-settings:'opsz' 144;
-        opacity:0.95;`}
+        font-variation-settings:'opsz' 144;`}
     >
       {meta.mono}
     </span>
-  </div>
+  ) : (
+    /* Rich layout (md/lg): top strip + big mono + bottom strip */
+    <div class="absolute inset-0 flex flex-col justify-between" style={padStyle}>
+      <div class="relative z-[1] flex items-center justify-between">
+        <span class="uppercase font-semibold tracking-[0.12em] opacity-[0.85]" style={`font-size:${t.smallMono + 1}px;`}>
+          {sourceName}
+        </span>
+        {dateLabel && (
+          <span class="uppercase tracking-[0.08em] font-medium opacity-70" style={`font-size:${t.smallMono + 1}px;`}>
+            {dateLabel}
+          </span>
+        )}
+      </div>
 
-  {/* Bottom: category + AUPA monogram */}
-  <div class="relative z-[1] flex items-end justify-between gap-2">
-    {categoryLabel[category] ? (
-      <span class="uppercase tracking-[0.12em] font-semibold opacity-85" style={`font-size:${t.smallMono + 1}px;`}>
-        {categoryLabel[category]}
-      </span>
-    ) : (
-      <span aria-hidden="true">&nbsp;</span>
-    )}
-    <span class="tracking-[0.18em] font-bold opacity-60 uppercase" style={`font-size:${t.smallMono}px;`}>
-      AUPA · AB
-    </span>
-  </div>
+      <div class="relative z-[1] flex-1 flex items-center justify-center">
+        <span
+          class="font-serif font-semibold leading-none"
+          aria-hidden="true"
+          style={`color:${fg};
+            ${bigMonoSize};
+            letter-spacing:-0.04em;
+            font-variation-settings:'opsz' 144;
+            opacity:0.95;`}
+        >
+          {meta.mono}
+        </span>
+      </div>
+
+      <div class="relative z-[1] flex items-end justify-between gap-2">
+        {categoryLabel[category] ? (
+          <span class="uppercase tracking-[0.12em] font-semibold opacity-85" style={`font-size:${t.smallMono + 1}px;`}>
+            {categoryLabel[category]}
+          </span>
+        ) : (
+          <span aria-hidden="true">&nbsp;</span>
+        )}
+        <span class="tracking-[0.18em] font-bold opacity-60 uppercase" style={`font-size:${t.smallMono}px;`}>
+          AUPA · AB
+        </span>
+      </div>
+    </div>
+  )}
 </div>
