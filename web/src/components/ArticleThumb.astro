@@ -34,10 +34,9 @@ interface Props {
 const { coverImageUrl, ...rest } = Astro.props;
 ---
 
-<div class:list={['relative w-full h-full overflow-hidden', rest.class]}>
-  {/* Chip fallback rendered first so the image overlays it. If the image
-      fails to load the onerror handler hides the <img>, exposing the chip. */}
-  <div class="absolute inset-0">
+<div class:list={['relative w-full h-full overflow-hidden bg-night', rest.class]}>
+  {/* Chip fallback at the bottom of the stack. */}
+  <div class="absolute inset-0 z-0">
     <EditorialThumb {...rest} />
   </div>
   {coverImageUrl && (
@@ -47,8 +46,8 @@ const { coverImageUrl, ...rest } = Astro.props;
       loading="lazy"
       decoding="async"
       referrerpolicy="no-referrer"
-      class="relative w-full h-full object-cover"
-      onerror="this.style.display='none'"
+      class="absolute inset-0 z-10 w-full h-full object-cover"
+      onerror="this.remove()"
     />
   )}
 </div>
