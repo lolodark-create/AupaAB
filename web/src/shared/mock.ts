@@ -359,23 +359,13 @@ export const ARTICLES: MockArticle[] = [
   }),
 ];
 
-export const NEXT_MATCH = {
-  home: {
-    name: 'Aviron Bayonnais',
-    short: 'AB',
-    form: ['V', 'D', 'V', 'V', 'N'] as const,
-  },
-  away: {
-    name: 'Stade Toulousain',
-    short: 'ST',
-    form: ['V', 'V', 'V', 'D', 'V'] as const,
-  },
-  venue: 'Stade Jean-Dauger',
-  kickoff: 'Samedi 17 mai · 21h05',
-  competition: 'Top 14 · J24',
-  diffusion: 'Canal+ Sport',
-  daysOut: 3,
-};
+// NEXT_MATCH / TRIBUNE / TRENDING removed in V1.1 — they were fake fixture
+// data, fake user tribune entries, and fake popularity rankings. We had no
+// view tracking yet, no real fixtures source, and no community in V1, so
+// keeping the mocks would just have invited regressions. To bring back:
+//   - fixtures: scrape LNR or stand up a small fixtures table
+//   - trending: enable view-count writes via a beacon, then ORDER BY view_count
+//   - tribune: V2 feature, opens with comments
 
 export const COMMENTS: CommentWithAuthor[] = [
   {
@@ -503,20 +493,6 @@ export const POPULAR_SEARCHES = [
   'Tana Umaga',
   'Top 14',
   'Patat',
-];
-
-export const TRENDING = [
-  { rank: 1, title: 'Mercato : les rumeurs de fin de saison, classées', slug: 'mercato-rumeurs-classement' },
-  { rank: 2, title: 'Edwin Maka prolonge deux saisons', slug: 'edwin-maka-prolonge-deux-saisons' },
-  { rank: 3, title: 'Tana Umaga aperçu à Anglet', slug: 'tana-umaga-rumeur-anglet' },
-  { rank: 4, title: "Derby : le BO en Pro D2 l'an prochain", slug: 'derby-biarritz-pro-d2' },
-  { rank: 5, title: 'Patat avant Toulouse', slug: 'patat-conference-presse-toulouse' },
-];
-
-export const TRIBUNE = [
-  { id: 't1', author: '@maite_etxegoyen', caption: 'Avant Castres, vue de la Sud — encore eux qui chantent en premier.' },
-  { id: 't2', author: '@kanboko', caption: 'Mon fils, sa première écharpe. Ne dites rien à sa mère (supportrice du BO).' },
-  { id: 't3', author: '@txomin', caption: "6h du matin, parking de Jean-Dauger. Les billets, c'est sacré." },
 ];
 
 export type { MockArticle };

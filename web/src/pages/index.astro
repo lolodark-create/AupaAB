@@ -1,12 +1,9 @@
 ---
-// Home = actualités list. Was: editorial home with hero, KPIs, themed
-// sections, Tribune placeholder. User collapsed it into the feed because
-// it's more direct. The MatchBanner ("Prochain match · J-3, AB vs ST,
-// Samedi 17 mai · 21h05, Stade Jean-Dauger") was removed in a follow-up:
-// it was fully mocked from @shared/mock with no real fixture data behind
-// it, and showing fake countdown/venue/diffusion data is worse than not
-// showing it at all. To bring it back: add a `fixtures` table to Supabase
-// or wire a LNR/Top14 fixture source via the crawler.
+// Home = actualités list. Was an editorial home with hero card, KPIs,
+// themed sections and a Tribune mock; collapsed into the feed because the
+// mocks read as fake and the editorial framing got in the way of the news.
+// To restore a fixture banner here: add a `fixtures` table populated from
+// LNR or scraped from a public source.
 import SiteShell from '~/layouts/SiteShell.astro';
 import ArticleCard from '~/components/ArticleCard.astro';
 import Button from '~/components/atoms/Button.astro';
@@ -16,6 +13,8 @@ import type { ArticleCategory } from '@shared/types';
 const url = Astro.url;
 const cat = (url.searchParams.get('cat') ?? 'all') as ArticleCategory | 'all';
 const src = url.searchParams.get('src') ?? 'all';
+type Since = 'all' | 'today' | 'week' | 'month';
+const since = (url.searchParams.get('since') ?? 'all') as Since;
 
 const allCats: Array<{ key: ArticleCategory | 'all'; label: string }> = [
   { key: 'all', label: 'Tout' },
@@ -27,9 +26,17 @@ const allCats: Array<{ key: ArticleCategory | 'all'; label: string }> = [
   { key: 'autre', label: 'Autre' },
 ];
 
+const sinceFilters: Array<{ key: Since; label: string }> = [
+  { key: 'all',   label: 'Depuis toujours' },
+  { key: 'today', label: '24 h' },
+  { key: 'week',  label: '7 jours' },
+  { key: 'month', label: '30 jours' },
+];
+
 const articles = await listArticles({
   cat: cat === 'all' ? undefined : cat,
   src: src === 'all' ? undefined : src,
+  since: since === 'all' ? undefined : since,
   limit: 50,
 });
 
@@ -40,11 +47,17 @@ const sourceList = await listSourcesWithArticles();
 // shorter set used by the filter dropdown.
 const activeSourceCount = (await listActiveSources()).length;
 
-// Build href preserving the OTHER filter
-const filterHref = (catKey: ArticleCategory | 'all') => {
+// Build href preserving the OTHER filters
+const buildHref = (overrides: Partial<{ cat: ArticleCategory | 'all'; src: string; since: Since }>) => {
+  const next = {
+    cat: overrides.cat ?? cat,
+    src: overrides.src ?? src,
+    since: overrides.since ?? since,
+  };
   const params = new URLSearchParams();
-  if (catKey !== 'all') params.set('cat', catKey);
-  if (src !== 'all') params.set('src', src);
+  if (next.cat !== 'all') params.set('cat', next.cat);
+  if (next.src !== 'all') params.set('src', next.src);
+  if (next.since !== 'all') params.set('since', next.since);
   const qs = params.toString();
   return qs ? `/?${qs}` : '/';
 };
@@ -77,7 +90,7 @@ const filterHref = (catKey: ArticleCategory | 'all') => {
           const isActive = c.key === cat;
           return (
             <a
-              href={filterHref(c.key)}
+              href={buildHref({ cat: c.key })}
               role="tab"
               aria-selected={isActive ? 'true' : 'false'}
               class:list={[
@@ -92,6 +105,32 @@ const filterHref = (catKey: ArticleCategory | 'all') => {
           );
         })}
       </div>
+
+      {/* Period chips — second row */}
+      <div class="flex gap-2 overflow-x-auto pb-1 mt-2" role="tablist" aria-label="Période">
+        {sinceFilters.map((s) => {
+          const isActive = s.key === since;
+          return (
+            <a
+              href={buildHref({ since: s.key })}
+              role="tab"
+              aria-selected={isActive ? 'true' : 'false'}
+              class:list={[
+                'px-3 py-1.5 text-[12px] font-medium whitespace-nowrap rounded-full transition-colors',
+                isActive
+                  ? 'bg-aviron text-white dark:text-night border border-aviron'
+                  : 'border border-border-subtle text-fg-tertiary hover:text-fg',
+              ]}
+            >
+              {s.label}
+            </a>
+          );
+        })}
+        <span class="ml-auto self-center text-[12px] text-fg-secondary tnum hidden md:inline">
+          {articles.length} article{articles.length > 1 ? 's' : ''}
+        </span>
+      </div>
+
       <div class="hidden md:flex gap-3 mt-3 items-center">
         <label class="text-[13px] text-fg-secondary">
           Source
@@ -107,18 +146,17 @@ const filterHref = (catKey: ArticleCategory | 'all') => {
           </select>
         </label>
         {cat !== 'all' && <input type="hidden" name="cat" value={cat} />}
-        <span class="ml-auto text-[12.5px] text-fg-secondary tnum">
-          {articles.length} article{articles.length > 1 ? 's' : ''}
-        </span>
+        {since !== 'all' && <input type="hidden" name="since" value={since} />}
       </div>
     </form>
 
     {/* Article list */}
     <div>
       {articles.length === 0 ? (
-        <p class="py-16 text-center text-fg-secondary">
-          Aucun article ne correspond à ces filtres. <a href="/" class="text-aviron underline">Réinitialiser</a>.
-        </p>
+        <div class="py-16 text-center text-fg-secondary">
+          <p class="m-0 mb-2">Aucun article ne correspond à ces filtres.</p>
+          <a href="/" class="text-aviron underline text-[13px]">Réinitialiser tout</a>
+        </div>
       ) : (
         articles.map((a) => (
           <ArticleCard

@@ -122,14 +122,24 @@ function fromMock(a: (typeof MOCK_ARTICLES)[number]): ArticleListItem {
 export async function listArticles(params: {
   cat?: ArticleCategory;
   src?: string;
+  /** "today" | "week" | "month" — filters published_at relative to now */
+  since?: 'today' | 'week' | 'month';
   limit?: number;
 } = {}): Promise<ArticleListItem[]> {
   const limit = params.limit ?? 50;
+
+  // Compute cutoff once, used by both mock and DB paths.
+  const cutoffMs =
+    params.since === 'today'  ? Date.now() - 1 * 86_400_000 :
+    params.since === 'week'   ? Date.now() - 7 * 86_400_000 :
+    params.since === 'month'  ? Date.now() - 30 * 86_400_000 :
+    null;
 
   if (!isConfigured()) {
     let items = MOCK_ARTICLES.slice();
     if (params.cat) items = items.filter((a) => a.category === params.cat);
     if (params.src) items = items.filter((a) => a.source.slug === params.src);
+    if (cutoffMs !== null) items = items.filter((a) => Date.parse(a.published_at) >= cutoffMs);
     return items
       .sort((a, b) => Date.parse(b.published_at) - Date.parse(a.published_at))
       .slice(0, limit)
@@ -145,6 +155,7 @@ export async function listArticles(params: {
     .order('published_at', { ascending: false })
     .limit(limit);
   if (params.cat) q = q.eq('category', params.cat);
+  if (cutoffMs !== null) q = q.gte('published_at', new Date(cutoffMs).toISOString());
   // For source filter we need to resolve the source_id first
   if (params.src) {
     const { data: src } = await sb.from('sources').select('id').eq('slug', params.src).maybeSingle();
