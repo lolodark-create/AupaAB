@@ -64,24 +64,28 @@ function isRelevantToAB(item) {
   if (!raw.trim()) return false;
   const t = removeAccents(raw.toLowerCase()).replace(/[-_]+/g, ' ');
 
-  const hasAvironOrBayonne = /\b(bayonne|aviron)\b/.test(t);
-
-  // Reject: title clearly names another club AND has no AB anchor
+  // Reject if another club appears in the title BEFORE the first AB anchor.
+  // Catches panel-format ICI titles like "Hugo Pirlet avant le Biarritz
+  // Olympique … et débrief Bayonne-UBB" — primary subject is BO, AB only
+  // mentioned as a secondary debrief.
+  const abPos = (() => {
+    const m = t.match(/\b(aviron|bayonne)\b/);
+    return m ? m.index ?? Infinity : Infinity;
+  })();
   for (const club of OTHER_CLUB_REJECT) {
-    if (t.includes(removeAccents(club).replace(/[-_]+/g, ' ')) && !hasAvironOrBayonne) {
-      return false;
-    }
+    const idx = t.indexOf(removeAccents(club).replace(/[-_]+/g, ' '));
+    if (idx !== -1 && idx < abPos) return false;
   }
 
-  // 1. Direct club reference in title (strongest signal)
+  // 1. Direct club reference
   for (const kw of STRONG_PHRASES) {
     if (t.includes(removeAccents(kw).replace(/[-_]+/g, ' '))) return true;
   }
   // 2. "bayonne" as a standalone word in title
   if (/\bbayonne\b/.test(t)) return true;
-  // 3. "AB" as a case-sensitive standalone token (rare but explicit)
+  // 3. "AB" as a case-sensitive standalone token
   if (/\bAB\b/.test(raw)) return true;
-  // 4. AB roster surname in title (only counts if no opposing club is named)
+  // 4. AB roster surname in title
   for (const n of AB_NAMES) {
     if (new RegExp(`\\b${n}\\b`, 'i').test(t)) return true;
   }

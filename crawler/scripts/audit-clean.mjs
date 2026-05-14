@@ -46,13 +46,19 @@ const OTHER_CLUB_REJECT = [
 function isStrictlyAB(title, _excerpt) {
   const raw = title || '';
   const t = removeAccents(raw.toLowerCase()).replace(/[-_]+/g, ' ');
-  const hasAvironOrBayonne = /\b(bayonne|aviron)\b/.test(t);
 
-  // Reject if another club's name is in the title AND no AB anchor
+  // Reject if another club is named in the title AND no AB anchor appears
+  // BEFORE the other club's name. Catches "Hugo Pirlet avant le Biarritz
+  // Olympique … et débrief Bayonne-UBB" — BO is the lead, Bayonne is a
+  // tangent at the end.
+  const abPos = (() => {
+    const m = t.match(/\b(aviron|bayonne)\b/);
+    return m ? m.index ?? Infinity : Infinity;
+  })();
   for (const club of OTHER_CLUB_REJECT) {
-    if (t.includes(removeAccents(club).replace(/[-_]+/g, ' ')) && !hasAvironOrBayonne) {
-      return false;
-    }
+    const clubNorm = removeAccents(club).replace(/[-_]+/g, ' ');
+    const idx = t.indexOf(clubNorm);
+    if (idx !== -1 && idx < abPos) return false;
   }
 
   for (const kw of STRONG_PHRASES) {
