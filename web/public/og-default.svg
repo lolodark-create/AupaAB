@@ -4,65 +4,64 @@
       <stop offset="0%" stop-color="#0B2545"/>
       <stop offset="100%" stop-color="#061528"/>
     </linearGradient>
-    <pattern id="lauburu" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse" patternTransform="rotate(15)">
-      <g stroke="#3FB0E5" fill="none" stroke-width="1.2" opacity="0.06" transform="translate(100,100) scale(1.6)">
-        <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z"/>
-        <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="rotate(90 50 50)"/>
-        <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="rotate(180 50 50)"/>
-        <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="rotate(270 50 50)"/>
-      </g>
-    </pattern>
   </defs>
 
   <rect width="1200" height="630" fill="url(#bg)"/>
-  <rect width="1200" height="630" fill="url(#lauburu)"/>
 
-  <!-- Big lauburu accent -->
-  <g transform="translate(960 315) scale(3.4)" stroke="#3FB0E5" fill="none" stroke-width="0.9" opacity="0.12">
-    <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="translate(-50 -50)"/>
-    <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="translate(-50 -50) rotate(90 50 50)"/>
-    <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="translate(-50 -50) rotate(180 50 50)"/>
-    <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="translate(-50 -50) rotate(270 50 50)"/>
+  <!-- Big logo accent right side -->
+  <g transform="translate(870 165)">
+    <rect width="300" height="300" rx="40" fill="#B3DCFA" opacity="0.18"/>
   </g>
 
   <!-- Top: brand mark -->
   <g transform="translate(80 80)">
-    <g transform="translate(0 0)" stroke="#3FB0E5" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="0" y="0" width="64" height="64" rx="10" fill="#0B2545" stroke="#3FB0E5" stroke-width="0"/>
-      <g transform="translate(32 32) scale(0.55)">
-        <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="translate(-50 -50)"/>
-        <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="translate(-50 -50) rotate(90 50 50)"/>
-        <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="translate(-50 -50) rotate(180 50 50)"/>
-        <path d="M50 50 C50 30, 30 30, 30 50 C30 40, 40 40, 50 50 Z" transform="translate(-50 -50) rotate(270 50 50)"/>
-      </g>
-    </g>
-    <text x="84" y="42" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="32" fill="#FAFAF7" letter-spacing="-0.5">
-      AUPA <tspan fill="#3FB0E5">AB</tspan>
+    <rect x="0" y="0" width="80" height="80" rx="14" fill="#B3DCFA"/>
+    <text x="40" y="35" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Arial Black', sans-serif"
+          font-weight="900" font-size="25" fill="white" letter-spacing="-1.5">AUPA</text>
+    <text x="40" y="68" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Arial Black', sans-serif"
+          font-weight="900" font-size="25" fill="white" letter-spacing="-1.5">AB</text>
+
+    <text x="104" y="42"
+          font-family="'New York', 'Iowan Old Style', Charter, Georgia, serif"
+          font-weight="600" font-size="32" fill="#FAFAF7" letter-spacing="-0.5">
+      AUPA <tspan fill="#B3DCFA">AB</tspan>
     </text>
-    <text x="84" y="64" font-family="Inter, sans-serif" font-weight="500" font-size="13" fill="#9CA3AF" letter-spacing="2.5" text-transform="uppercase">
+    <text x="104" y="68"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-weight="500" font-size="13" fill="#9CA3AF" letter-spacing="2.5">
       TRIBUNE DES SUPPORTERS
     </text>
   </g>
 
   <!-- Title block -->
   <g transform="translate(80 260)">
-    <text font-family="Inter, sans-serif" font-weight="600" font-size="14" fill="#3FB0E5" letter-spacing="3">
+    <text font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-weight="600" font-size="14" fill="#B3DCFA" letter-spacing="3">
       AGRÉGATEUR · NON-OFFICIEL
     </text>
-    <text y="60" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="72" fill="#FAFAF7" letter-spacing="-1">
+    <text y="60"
+          font-family="'New York', 'Iowan Old Style', Charter, Georgia, serif"
+          font-weight="600" font-size="72" fill="#FAFAF7" letter-spacing="-1">
       L'Aviron Bayonnais,
     </text>
-    <text y="146" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="72" fill="#FAFAF7" letter-spacing="-1">
-      <tspan fill="#3FB0E5">en un seul endroit.</tspan>
+    <text y="146"
+          font-family="'New York', 'Iowan Old Style', Charter, Georgia, serif"
+          font-weight="600" font-size="72" fill="#FAFAF7" letter-spacing="-1">
+      <tspan fill="#B3DCFA">sans en perdre une miette.</tspan>
     </text>
-    <text y="210" font-family="Inter, sans-serif" font-weight="400" font-size="22" fill="#9CA3AF">
-      Toute l'actu agrégée depuis 8 médias, sans pub intrusive.
+    <text y="210"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-weight="400" font-size="22" fill="#9CA3AF">
+      Toute l'actu agrégée depuis 6 médias, sans pub intrusive.
     </text>
   </g>
 
   <!-- Footer accent -->
   <g transform="translate(80 565)">
-    <text font-family="Inter, sans-serif" font-weight="600" font-size="13" fill="rgba(250,250,247,0.55)" letter-spacing="2.5">
+    <text font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-weight="600" font-size="13" fill="rgba(250,250,247,0.55)" letter-spacing="2.5">
       AUPA-AB.COM · CONSTRUIT À BAYONNE · LU PARTOUT
     </text>
   </g>

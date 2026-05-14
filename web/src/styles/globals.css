@@ -19,6 +19,11 @@
     --c-aviron: 0 107 157;
     --c-aviron-bg: 0 153 216;
     --c-aviron-press: 0 80 121;
+    /* --c-ciel: AUPA AB logo background. Sky blue inspired by the club's
+       "ciel et blanc" identity. Too light for body text (≈2:1 on white) — use
+       only for surfaces with white-on-color content (the logo mark) or
+       decorative accents. */
+    --c-ciel: 179 220 250;
     --c-night: 11 37 69;
     --c-off-white: 250 250 247;
     --c-slate: 26 29 36;
@@ -60,6 +65,9 @@
     --c-aviron: 63 176 229;
     --c-aviron-bg: 63 176 229;
     --c-aviron-press: 101 191 234;
+    /* In dark mode, ciel is the same sky blue — still works against white
+       text and against the navy background. */
+    --c-ciel: 179 220 250;
     --c-night: 6 21 40;
     --c-off-white: 14 17 22;
     --c-slate: 230 230 225;

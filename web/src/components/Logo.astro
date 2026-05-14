@@ -1,5 +1,12 @@
 ---
-import Lauburu from './atoms/Lauburu.astro';
+// AUPA AB logo — sky-blue square with stacked "AUPA / AB" in heavy white
+// sans-serif. Was: night-blue square with Lauburu cross. New mark is closer
+// to the club's "ciel et blanc" identity and matches the user-provided
+// reference image.
+//
+// Inline SVG (not an <img>) so it inherits CSS color tokens, scales without
+// rasterizing, and stays a single HTTP request away from "no flash of
+// unstyled mark".
 interface Props {
   variant?: 'full' | 'mark';
   size?: number;
@@ -10,11 +17,34 @@ const { variant = 'full', size = 36, class: className } = Astro.props;
 
 <a href="/" class:list={['flex items-center gap-2.5 group', className]} aria-label="AUPA AB — accueil">
   <span
-    class="inline-flex items-center justify-center rounded-md bg-night text-white shrink-0"
+    class="inline-flex items-center justify-center rounded-md shrink-0 bg-ciel overflow-hidden"
     style={`width:${size}px; height:${size}px;`}
     aria-hidden="true"
   >
-    <Lauburu size={Math.round(size * 0.65)} stroke="#3FB0E5" strokeWidth={1.5} />
+    {/* viewBox 100×100 so font-size values are percentages-ish; SVG <text>
+        scales linearly with the outer rect. Heavy weight + tight letter
+        spacing reproduces the reference image's slab-like presence. */}
+    <svg viewBox="0 0 100 100" width={size} height={size} xmlns="http://www.w3.org/2000/svg" role="img">
+      <title>AUPA AB</title>
+      <text
+        x="50" y="45"
+        text-anchor="middle"
+        fill="white"
+        font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI Black', 'Arial Black', system-ui, sans-serif"
+        font-weight="900"
+        font-size="32"
+        letter-spacing="-2"
+      >AUPA</text>
+      <text
+        x="50" y="86"
+        text-anchor="middle"
+        fill="white"
+        font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI Black', 'Arial Black', system-ui, sans-serif"
+        font-weight="900"
+        font-size="32"
+        letter-spacing="-2"
+      >AB</text>
+    </svg>
   </span>
   {variant === 'full' && (
     <span class="flex flex-col leading-none">

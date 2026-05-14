@@ -11,6 +11,7 @@ export default {
           bg: 'rgb(var(--c-aviron-bg) / <alpha-value>)',
           press: 'rgb(var(--c-aviron-press) / <alpha-value>)',
         },
+        'ciel': 'rgb(var(--c-ciel) / <alpha-value>)',
         'night': 'rgb(var(--c-night) / <alpha-value>)',
         'off-white': 'rgb(var(--c-off-white) / <alpha-value>)',
         'slate-aupa': 'rgb(var(--c-slate) / <alpha-value>)',
