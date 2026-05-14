@@ -55,3 +55,12 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: node crawler/scripts/dedup-clusters.mjs --apply
+
+      # AI synthesis for the surviving articles. Replaces the raw RSS excerpt
+      # on cards with a 2-sentence Tribune-Sud blurb. No-ops if
+      # ANTHROPIC_API_KEY is missing (UI falls back to excerpt).
+      - name: Synthesize new articles
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node crawler/scripts/synthesize.mjs --limit=20

@@ -14,6 +14,7 @@ export interface ArticleListItem {
   slug: string;
   title: string;
   excerpt: string;
+  ai_synthesis: string | null;
   author: string | null;
   published_at: string;
   category: ArticleCategory;
@@ -26,6 +27,9 @@ export interface ArticleListItem {
   time_label: string;
   date_label: string;
   reading_min: number;
+  // `lede` is the card preview text. Prefer ai_synthesis (AUPA-tone, ≤200
+  // chars) over the raw RSS excerpt. Pages bind <ArticleCard lede={} />
+  // directly so they don't need to know the precedence rule.
   lede: string | null;
   body?: string[];
   source_url?: string;
@@ -50,6 +54,7 @@ interface DbRow {
   slug: string;
   title: string;
   excerpt: string;
+  ai_synthesis?: string | null;
   author: string | null;
   published_at: string;
   category: ArticleCategory;
@@ -68,6 +73,7 @@ function toItem(r: DbRow): ArticleListItem {
     slug: r.slug,
     title: r.title,
     excerpt: r.excerpt,
+    ai_synthesis: r.ai_synthesis ?? null,
     author: r.author,
     published_at: r.published_at,
     category: r.category,
@@ -79,7 +85,8 @@ function toItem(r: DbRow): ArticleListItem {
     time_label: relativeLabel(r.published_at),
     date_label: DATE_FR.format(new Date(r.published_at)),
     reading_min: Math.max(1, Math.round((r.reading_time_sec ?? 180) / 60)),
-    lede: r.excerpt,
+    // Prefer the AI synthesis when available — falls back to raw excerpt.
+    lede: r.ai_synthesis ?? r.excerpt,
     source_url: r.source_url,
     tags: r.tags ?? [],
   };
@@ -91,6 +98,7 @@ function fromMock(a: (typeof MOCK_ARTICLES)[number]): ArticleListItem {
     slug: a.slug,
     title: a.title,
     excerpt: a.excerpt,
+    ai_synthesis: null,
     author: a.author,
     published_at: a.published_at,
     category: a.category,
@@ -132,7 +140,7 @@ export async function listArticles(params: {
   let q = sb
     .from('articles_public')
     .select(
-      'id, slug, title, excerpt, author, published_at, category, comment_count, reading_time_sec, cover_image_url, cover_variant, source_url, tags, sources(slug, name, domain)',
+      'id, slug, title, excerpt, ai_synthesis, author, published_at, category, comment_count, reading_time_sec, cover_image_url, cover_variant, source_url, tags, sources(slug, name, domain)',
     )
     .order('published_at', { ascending: false })
     .limit(limit);
@@ -164,7 +172,7 @@ export async function getArticle(slug: string): Promise<ArticleListItem | null> 
   const { data, error } = await sb
     .from('articles_public')
     .select(
-      'id, slug, title, excerpt, author, published_at, category, comment_count, reading_time_sec, cover_image_url, cover_variant, source_url, tags, sources(slug, name, domain)',
+      'id, slug, title, excerpt, ai_synthesis, author, published_at, category, comment_count, reading_time_sec, cover_image_url, cover_variant, source_url, tags, sources(slug, name, domain)',
     )
     .eq('slug', slug)
     .maybeSingle();
