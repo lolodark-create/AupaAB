@@ -1,15 +1,16 @@
 ---
-// Home = actualités list. User feedback ("la home page peut être l'onglet
-// actualité, c'est plus straight to the point") collapsed the old "À la une"
-// editorial layout into the actual article feed. The MatchBanner stays as a
-// small fixture-summary above the list, but no more featured-hero card,
-// KPI strip, themed sections, or Tribune placeholder.
+// Home = actualités list. Was: editorial home with hero, KPIs, themed
+// sections, Tribune placeholder. User collapsed it into the feed because
+// it's more direct. The MatchBanner ("Prochain match · J-3, AB vs ST,
+// Samedi 17 mai · 21h05, Stade Jean-Dauger") was removed in a follow-up:
+// it was fully mocked from @shared/mock with no real fixture data behind
+// it, and showing fake countdown/venue/diffusion data is worse than not
+// showing it at all. To bring it back: add a `fixtures` table to Supabase
+// or wire a LNR/Top14 fixture source via the crawler.
 import SiteShell from '~/layouts/SiteShell.astro';
-import MatchBanner from '~/components/MatchBanner.astro';
 import ArticleCard from '~/components/ArticleCard.astro';
 import Button from '~/components/atoms/Button.astro';
 import { listArticles, listActiveSources } from '~/lib/data';
-import { NEXT_MATCH } from '@shared/mock';
 import type { ArticleCategory } from '@shared/types';
 
 const url = Astro.url;
@@ -49,19 +50,8 @@ const filterHref = (catKey: ArticleCategory | 'all') => {
   description="Toute l'actualité de l'Aviron Bayonnais, agrégée depuis les principaux médias, mise à jour toutes les 15 minutes."
 >
   <div class="max-w-container mx-auto px-4 md:px-8 pt-4 md:pt-6 pb-10 md:pb-20">
-    {/* Match banner */}
-    <MatchBanner
-      home={{ short: NEXT_MATCH.home.short, form: NEXT_MATCH.home.form }}
-      away={{ short: NEXT_MATCH.away.short, form: NEXT_MATCH.away.form }}
-      venue={NEXT_MATCH.venue}
-      kickoff={NEXT_MATCH.kickoff}
-      competition={NEXT_MATCH.competition}
-      diffusion={NEXT_MATCH.diffusion}
-      daysOut={NEXT_MATCH.daysOut}
-    />
-
     {/* Page intro — minimal, just enough to anchor the feed */}
-    <header class="mt-8 md:mt-12 mb-5 md:mb-7">
+    <header class="mt-2 md:mt-4 mb-5 md:mb-7">
       <span class="t-meta text-aviron">Actualités</span>
       <h1 class="mt-1 mb-2 font-serif font-semibold text-[32px] md:text-[48px] leading-[1.04] tracking-[-0.015em]" style="font-variation-settings:'opsz' 144, 'SOFT' 40; text-wrap:balance;">
         L'Aviron Bayonnais, en continu
