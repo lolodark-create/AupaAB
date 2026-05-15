@@ -31,31 +31,25 @@ const LIMIT = parseInt(args.find((a) => a.startsWith('--limit='))?.split('=')[1]
 
 const sql = postgres(DATABASE_URL, { ssl: 'require', max: 2, prepare: false });
 
-// ─── Pick today's articles (last 24 h, top 3, fresh ai_title + ai_synth) ──
+// ─── All articles from the past 24h (the digest is exhaustive, not a
+//     curated "top X"). Articles are already deduped + AI-synthesized at
+//     ingestion, so what's in the table is what makes the email.
 const articles = await sql`
-  select a.slug, a.title, a.ai_title, a.excerpt, a.ai_synthesis, s.name as source_name
+  select a.slug, a.title, a.ai_title, a.excerpt, a.ai_synthesis, a.category, s.name as source_name
   from public.articles a
   join public.sources s on s.id = a.source_id
   where a.is_published = true and a.takedown_reason is null
-    and a.published_at >= now() - interval '36 hours'
-    and a.ai_title is not null and a.ai_synthesis is not null
+    and a.published_at >= now() - interval '24 hours'
   order by a.published_at desc
-  limit 3
 `;
 
 if (articles.length === 0) {
-  console.log('⚠ no fresh articles in the last 36h — nothing to send today');
+  console.log('⚠ no fresh articles in the last 24h — nothing to send today');
   await sql.end();
   process.exit(0);
 }
 
-// One-liner stat ("Aujourd'hui : X articles depuis Y sources")
-const stats = await sql`
-  select count(*)::int as today, count(distinct source_id)::int as srcs
-  from public.articles
-  where published_at >= current_date
-`;
-const stat = `Aujourd'hui : ${stats[0].today} article${stats[0].today > 1 ? 's' : ''} depuis ${stats[0].srcs} source${stats[0].srcs > 1 ? 's' : ''}.`;
+const stat = `${articles.length} article${articles.length > 1 ? 's' : ''} sur l'Aviron Bayonnais dans les dernières 24 h. Tu as tout, ci-dessous.`;
 
 // ─── Recipients ───────────────────────────────────────────────────────────
 let recipients;
@@ -93,33 +87,64 @@ function shell(title, body) {
 </td></tr></table></body></html>`;
 }
 
+// Group articles by category — keeps the email scannable when there are
+// 10+ items. Order categories the way the home filter chips appear.
+const CAT_ORDER = ['match', 'mercato', 'coulisses', 'espoirs', 'pays_basque', 'autre'];
+const CAT_LABEL = {
+  match: 'Match', mercato: 'Mercato', coulisses: 'Coulisses',
+  espoirs: 'Espoirs', pays_basque: 'Pays Basque', autre: 'Brèves',
+};
+const byCategory = new Map();
+for (const a of articles) {
+  if (!byCategory.has(a.category)) byCategory.set(a.category, []);
+  byCategory.get(a.category).push(a);
+}
+
 function buildHtml(unsubToken) {
-  const cards = articles.map((a) => {
-    const url = `${SITE_URL}/article/${a.slug}`;
-    const headline = a.ai_title || a.title;
-    const synth = a.ai_synthesis || a.excerpt;
-    return `<a href="${url}" style="display:block;text-decoration:none;color:inherit;margin:0 0 18px;padding:16px;border:1px solid #E5E2D9;border-radius:10px;background:#FFFFFF;">
-      <div style="font-size:11px;color:#5F6975;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 6px;">${a.source_name}</div>
-      <div style="font-family:'New York','Iowan Old Style',Charter,Georgia,serif;font-size:18px;line-height:1.25;font-weight:600;color:#1A1D24;margin:0 0 8px;letter-spacing:-0.01em;">${headline}</div>
-      <div style="font-size:14px;line-height:1.5;color:#5A6472;margin:0;">${synth}</div>
-    </a>`;
-  }).join('');
+  const sections = CAT_ORDER
+    .filter((c) => byCategory.has(c))
+    .map((cat) => {
+      const items = byCategory.get(cat);
+      const cards = items.map((a) => {
+        const url = `${SITE_URL}/article/${a.slug}`;
+        const headline = a.ai_title || a.title;
+        const synth = a.ai_synthesis || a.excerpt;
+        return `<a href="${url}" style="display:block;text-decoration:none;color:inherit;margin:0 0 12px;padding:14px 16px;border:1px solid #E5E2D9;border-radius:10px;background:#FFFFFF;">
+          <div style="font-size:11px;color:#5F6975;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 6px;">${a.source_name}</div>
+          <div style="font-family:'New York','Iowan Old Style',Charter,Georgia,serif;font-size:17px;line-height:1.25;font-weight:600;color:#1A1D24;margin:0 0 6px;letter-spacing:-0.01em;">${headline}</div>
+          <div style="font-size:14px;line-height:1.5;color:#5A6472;margin:0;">${synth}</div>
+        </a>`;
+      }).join('');
+      return `<h2 style="font-size:13px;text-transform:uppercase;letter-spacing:1.5px;color:#006B9D;margin:28px 0 12px;font-weight:600;">${CAT_LABEL[cat]} · ${items.length}</h2>${cards}`;
+    }).join('');
+
   const unsubLink = `${SITE_URL}/api/unsubscribe?token=${unsubToken}`;
   return shell('AUPA AB · La brève du matin', `
     <h1 style="font-family:'New York','Iowan Old Style',Charter,Georgia,serif;font-size:26px;line-height:1.15;margin:0 0 6px;font-weight:600;letter-spacing:-0.01em;">La brève du matin</h1>
-    <p style="font-size:13px;color:#5F6975;margin:0 0 24px;">${stat}</p>
-    ${cards}
-    <p style="margin:24px 0 0;font-size:13px;color:#5F6975;line-height:1.55;">Bonne journée. <a href="${SITE_URL}" style="color:#006B9D;">Voir tout sur aupa-ab.com</a></p>
-    <p style="margin:32px 0 0;font-size:11px;color:#878E9A;line-height:1.5;text-align:center;">
-      Tu veux arrêter de recevoir cette brève ? <a href="${unsubLink}" style="color:#878E9A;">Se désinscrire en 1 clic</a>.
+    <p style="font-size:13px;color:#5F6975;margin:0 0 8px;">${stat}</p>
+    ${sections}
+    <p style="margin:32px 0 0;font-size:13px;color:#5F6975;line-height:1.55;">Bonne journée. <a href="${SITE_URL}" style="color:#006B9D;">Voir tout sur aupa-ab.com</a></p>
+    <p style="margin:24px 0 0;font-size:11px;color:#878E9A;line-height:1.5;text-align:center;">
+      Tu veux arrêter ? <a href="${unsubLink}" style="color:#878E9A;">Se désinscrire en 1 clic</a>.
     </p>`);
 }
 function buildText(unsubToken) {
-  const items = articles.map((a) => `▸ ${a.ai_title || a.title}\n  ${a.ai_synthesis || a.excerpt}\n  → ${SITE_URL}/article/${a.slug}`).join('\n\n');
-  return `AUPA AB · La brève du matin\n${stat}\n\n${items}\n\n— Se désinscrire : ${SITE_URL}/api/unsubscribe?token=${unsubToken}`;
+  const sections = CAT_ORDER
+    .filter((c) => byCategory.has(c))
+    .map((cat) => {
+      const items = byCategory.get(cat);
+      const block = items.map((a) =>
+        `▸ ${a.ai_title || a.title}\n  ${a.ai_synthesis || a.excerpt}\n  → ${SITE_URL}/article/${a.slug}`,
+      ).join('\n\n');
+      return `\n— ${CAT_LABEL[cat].toUpperCase()} (${items.length}) —\n\n${block}`;
+    }).join('\n');
+  return `AUPA AB · La brève du matin\n${stat}\n${sections}\n\n— Se désinscrire : ${SITE_URL}/api/unsubscribe?token=${unsubToken}`;
 }
 
-const subject = `[AUPA AB] ${articles[0].ai_title || articles[0].title}`;
+// Subject = first headline if there's just one, otherwise count + lead
+const subject = articles.length === 1
+  ? `[AUPA AB] ${articles[0].ai_title || articles[0].title}`
+  : `[AUPA AB] ${articles.length} articles aujourd'hui — ${articles[0].ai_title || articles[0].title}`;
 
 if (DRY) {
   console.log('--- SUBJECT ---');

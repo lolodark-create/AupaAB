@@ -7,15 +7,15 @@ import SiteShell from '~/layouts/SiteShell.astro';
 
 <SiteShell
   title="La brève du matin"
-  description="Chaque matin à 8h, les 3 actus AB à retenir, en deux phrases pour chacune. Pas de pub, pas de pisteur, désabonnement en un clic."
+  description="Chaque matin à 8h, tous les articles AB des dernières 24h, déjà déduplliqués et synthétisés. Pas de pub, pas de pisteur, désabonnement en un clic."
 >
   <div class="max-w-reading mx-auto px-4 md:px-6 pt-10 md:pt-16 pb-20">
     <span class="t-meta text-aviron">Newsletter</span>
     <h1 class="mt-1 mb-4 font-serif font-semibold text-[36px] md:text-[52px] leading-[1.04] tracking-[-0.015em]" style="font-variation-settings:'opsz' 144, 'SOFT' 40; text-wrap:balance;">
-      8 h. Trois articles. Deux phrases chacun.
+      Tout l'AB d'hier, dans ta boîte à 8 h.
     </h1>
     <p class="text-[17px] md:text-[19px] leading-[1.55] text-fg-secondary mb-8">
-      Chaque matin, on lit les six médias qui parlent de l'Aviron Bayonnais et on te résume les <strong class="text-fg">3 articles qui méritent ta minute</strong>. Pas de pub, pas de tracker, pas de "et n'oubliez pas de cliquer". Désabonnement en un clic.
+      Chaque matin, on te livre <strong class="text-fg">l'intégralité des articles AB des dernières 24 h</strong>, dédupliqués et synthétisés en deux phrases chacun. Pas un article ne t'échappe. Pas de pub, pas de tracker, désabonnement en un clic.
     </p>
 
     <form id="newsletter-form" class="flex flex-col sm:flex-row gap-3 mb-3" novalidate>
@@ -39,7 +39,7 @@ import SiteShell from '~/layouts/SiteShell.astro';
     <div class="grid grid-cols-3 gap-3 md:gap-6 mt-12 mb-14">
       {[
         { kpi: '8 h', label: 'tous les matins' },
-        { kpi: '3', label: 'articles seulement' },
+        { kpi: '100 %', label: 'des articles AB' },
         { kpi: '0', label: 'pub, 0 tracker' },
       ].map((s) => (
         <div class="px-4 py-5 bg-bg-subtle rounded-lg text-center">
@@ -51,7 +51,7 @@ import SiteShell from '~/layouts/SiteShell.astro';
 
     <div class="space-y-5 text-[15px] leading-[1.6] text-fg-secondary">
       <p>
-        <strong class="text-fg">Pourquoi cette newsletter ?</strong> Parce qu'on a fait le calcul : six médias × cinq articles par jour = trente. Personne n'a le temps. On lit pour toi et on te garde le meilleur.
+        <strong class="text-fg">Pourquoi cette newsletter ?</strong> Parce qu'on est huit médias à couvrir l'AB et que personne n'a le temps de tous les ouvrir. On agrège, on dédupplique, on te livre l'exhaustivité du jour en une seule lecture.
       </p>
       <p>
         <strong class="text-fg">Pourquoi gratuit ?</strong> Parce qu'on est nous-mêmes supporters et qu'on veut juste partager. La newsletter restera gratuite pour les lecteurs.
