@@ -1,0 +1,16 @@
+---
+import SiteShell from '~/layouts/SiteShell.astro';
+---
+<SiteShell title="Lien invalide" description="Ce lien de newsletter n'est plus valide.">
+  <div class="max-w-reading mx-auto px-4 md:px-6 pt-16 md:pt-24 pb-24 text-center">
+    <h1 class="m-0 mb-4 font-serif font-semibold text-[32px] md:text-[42px] leading-[1.06]" style="font-variation-settings:'opsz' 120;">
+      Lien invalide ou expiré.
+    </h1>
+    <p class="text-[17px] leading-[1.6] text-fg-secondary max-w-[440px] mx-auto mb-8">
+      Ce lien ne correspond à aucune inscription active. Réessaie depuis la page newsletter — on te renvoie une confirmation fraîche.
+    </p>
+    <a href="/newsletter" class="inline-flex items-center gap-2 px-6 py-3 bg-aviron text-white dark:text-night font-medium rounded-md hover:bg-aviron-press transition-colors">
+      Retour à la newsletter
+    </a>
+  </div>
+</SiteShell>

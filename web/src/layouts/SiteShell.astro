@@ -1,10 +1,12 @@
 ---
-// SiteShell — wraps a page with Header + MobileDrawer + Footer.
-// Pages that don't need this chrome (e.g. /admin) can extend BaseLayout directly.
+// SiteShell — wraps a page with Header + MobileDrawer + (optional Newsletter
+// CTA) + Footer. Pages that don't need this chrome (e.g. /admin) can extend
+// BaseLayout directly.
 import BaseLayout from './BaseLayout.astro';
 import Header from '~/components/Header.astro';
 import MobileDrawer from '~/components/MobileDrawer.astro';
 import Footer from '~/components/Footer.astro';
+import NewsletterCTA from '~/components/NewsletterCTA.astro';
 import KlaroBootstrap from '~/components/KlaroBootstrap.astro';
 
 interface Props {
@@ -20,7 +22,16 @@ interface Props {
   sourceName?: string;
   sourceUrl?: string;
   noindex?: boolean;
+  /** Hide the global newsletter banner above the footer (default: shown). */
+  hideNewsletter?: boolean;
 }
+const { hideNewsletter = false } = Astro.props;
+
+const path = Astro.url.pathname;
+// Don't show the global banner on the newsletter pages themselves — would
+// be CTA-on-CTA. Detect via pathname.
+const onNewsletterPage = path.startsWith('/newsletter');
+const showNewsletter = !hideNewsletter && !onNewsletterPage;
 ---
 
 <BaseLayout {...Astro.props}>
@@ -29,6 +40,7 @@ interface Props {
   <main id="main">
     <slot />
   </main>
+  {showNewsletter && <NewsletterCTA variant="footer" />}
   <Footer />
   <KlaroBootstrap />
 </BaseLayout>

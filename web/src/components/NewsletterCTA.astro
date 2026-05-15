@@ -1,0 +1,138 @@
+---
+// Newsletter subscription CTA — three placements, one source of truth.
+//   variant="inline"    → drop into the feed every Nth row, full-width card
+//   variant="footer"    → big banner before <Footer>, end-of-scroll grab
+//   variant="article"   → end-of-article inline pitch
+// All variants POST to /api/newsletter/subscribe with a source_hint so we
+// can later measure which placement converts (Umami events + DB column).
+interface Props {
+  variant: 'inline' | 'footer' | 'article';
+  class?: string;
+}
+const { variant, class: className } = Astro.props;
+
+const copy = {
+  inline:  {
+    kicker: 'Newsletter',
+    title:  '3 articles par matin, jamais plus.',
+    body:   'Six médias, 30 articles/jour. On trie, on synthétise. Tu lis l\'essentiel en 90 secondes au café.',
+    cta:    'Je m\'abonne',
+  },
+  footer:  {
+    kicker: 'La brève AUPA AB',
+    title:  'Reçois l\'essentiel chaque matin à 8 h.',
+    body:   '3 articles AB synthétisés en deux phrases, sans pub, sans tracker. Désabonnement en 1 clic.',
+    cta:    'Je m\'abonne — gratuit',
+  },
+  article: {
+    kicker: 'Avant de partir',
+    title:  'L\'AB en deux phrases, chaque matin.',
+    body:   'Tu viens de lire un article, on en sélectionne 3 par jour qu\'on te résume. Ça t\'évitera de revenir dix fois.',
+    cta:    'M\'abonner',
+  },
+}[variant];
+
+const id = `nl-${variant}-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+{variant === 'footer' ? (
+  <section class:list={['bg-aviron text-white dark:text-night px-4 md:px-8 py-10 md:py-14', className]} aria-label="Inscription newsletter">
+    <div class="max-w-reading mx-auto text-center">
+      <span class="t-meta opacity-80" style="color:inherit;">{copy.kicker}</span>
+      <h2 class="mt-2 mb-3 font-serif font-semibold text-[28px] md:text-[36px] leading-[1.08] tracking-[-0.012em]" style="font-variation-settings:'opsz' 96, 'SOFT' 30; text-wrap:balance;">
+        {copy.title}
+      </h2>
+      <p class="m-0 mb-6 text-[15px] md:text-[16px] opacity-90 max-w-[460px] mx-auto leading-[1.55]">
+        {copy.body}
+      </p>
+      <form id={id} class="flex flex-col sm:flex-row gap-3 max-w-[480px] mx-auto" novalidate>
+        <input
+          type="email"
+          name="email"
+          required
+          placeholder="ton@email.com"
+          autocomplete="email"
+          class="flex-1 px-4 py-3 text-[16px] bg-white text-fg rounded-md placeholder:text-fg-tertiary focus:outline-none focus:ring-2 focus:ring-white/60"
+          style="color: rgb(var(--fg-primary));"
+        />
+        <button type="submit" class="px-5 py-3 bg-white text-aviron font-semibold rounded-md hover:opacity-90 transition-opacity whitespace-nowrap">
+          {copy.cta}
+        </button>
+      </form>
+      <p class="m-0 mt-3 text-[12px] opacity-75" data-feedback role="status" aria-live="polite">&nbsp;</p>
+    </div>
+  </section>
+) : (
+  <section class:list={[
+    'rounded-lg overflow-hidden border border-aviron/40 bg-aviron/[0.06] dark:bg-aviron/[0.10] p-5 md:p-6 my-6',
+    className,
+  ]} aria-label="Inscription newsletter">
+    <span class="t-meta text-aviron">{copy.kicker}</span>
+    <h3 class="mt-1.5 mb-2 font-serif font-semibold text-[20px] md:text-[24px] leading-[1.15] tracking-[-0.008em] m-0" style="font-variation-settings:'opsz' 60, 'SOFT' 20; text-wrap:balance;">
+      {copy.title}
+    </h3>
+    <p class="m-0 mb-4 text-[14.5px] leading-[1.55] text-fg-secondary">
+      {copy.body}
+    </p>
+    <form id={id} class="flex flex-col sm:flex-row gap-2.5" novalidate>
+      <input
+        type="email"
+        name="email"
+        required
+        placeholder="ton@email.com"
+        autocomplete="email"
+        class="flex-1 px-3.5 py-2.5 text-[15px] bg-bg-elevated border border-border-default rounded-md text-fg placeholder:text-fg-tertiary focus:outline-none focus:border-aviron focus:ring-2 focus:ring-aviron/30"
+      />
+      <button type="submit" class="px-4 py-2.5 bg-aviron text-white dark:text-night font-semibold text-[14px] rounded-md hover:bg-aviron-press transition-colors whitespace-nowrap">
+        {copy.cta}
+      </button>
+    </form>
+    <p class="m-0 mt-2.5 text-[12px] text-fg-tertiary min-h-[16px]" data-feedback role="status" aria-live="polite"></p>
+  </section>
+)}
+
+<script is:inline define:vars={{ id, variant }}>
+  (function () {
+    const form = document.getElementById(id);
+    if (!form) return;
+    const feedback = form.parentElement.querySelector('[data-feedback]');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = form.querySelector('input[name="email"]').value;
+      const btn = form.querySelector('button');
+      btn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = 'Envoi...';
+      try {
+        const res = await fetch('/api/newsletter/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, source_hint: variant }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          form.style.display = 'none';
+          if (feedback) {
+            feedback.textContent = '✓ Vérifie ta boîte mail.';
+            feedback.style.color = variant === 'footer' ? 'inherit' : 'rgb(var(--c-success))';
+            feedback.style.fontWeight = '600';
+          }
+        } else {
+          if (feedback) {
+            feedback.textContent = data.error || 'Erreur.';
+            feedback.style.color = 'rgb(var(--c-danger))';
+          }
+          btn.disabled = false;
+          btn.textContent = original;
+        }
+      } catch {
+        if (feedback) {
+          feedback.textContent = 'Erreur réseau.';
+          feedback.style.color = 'rgb(var(--c-danger))';
+        }
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    });
+  })();
+</script>

@@ -7,6 +7,7 @@
 import SiteShell from '~/layouts/SiteShell.astro';
 import ArticleCard from '~/components/ArticleCard.astro';
 import NextMatchBanner from '~/components/NextMatchBanner.astro';
+import NewsletterCTA from '~/components/NewsletterCTA.astro';
 import Button from '~/components/atoms/Button.astro';
 import { listArticles, listSourcesWithArticles, listActiveSources, getNextFixture } from '~/lib/data';
 import type { ArticleCategory } from '@shared/types';
@@ -154,7 +155,8 @@ const buildHref = (overrides: Partial<{ cat: ArticleCategory | 'all'; src: strin
       </div>
     </form>
 
-    {/* Article list */}
+    {/* Article list — interleave a newsletter CTA every 5 articles so
+        scanners hit it without scrolling all the way down. */}
     <div>
       {articles.length === 0 ? (
         <div class="py-16 text-center text-fg-secondary">
@@ -162,21 +164,26 @@ const buildHref = (overrides: Partial<{ cat: ArticleCategory | 'all'; src: strin
           <a href="/" class="text-aviron underline text-[13px]">Réinitialiser tout</a>
         </div>
       ) : (
-        articles.map((a) => (
-          <ArticleCard
-            variant="row"
-            slug={a.slug}
-            title={a.ai_title ?? a.title}
-            lede={a.lede ?? a.excerpt}
-            category={a.category}
-            sourceSlug={a.source.slug}
-            sourceName={a.source.name}
-            timeLabel={a.time_label}
-            dateLabel={a.date_label}
-            readingMin={a.reading_min}
-            commentCount={a.comment_count}
-            coverImageUrl={a.cover_image_url}
-          />
+        articles.map((a, i) => (
+          <Fragment>
+            <ArticleCard
+              variant="row"
+              slug={a.slug}
+              title={a.ai_title ?? a.title}
+              lede={a.lede ?? a.excerpt}
+              category={a.category}
+              sourceSlug={a.source.slug}
+              sourceName={a.source.name}
+              timeLabel={a.time_label}
+              dateLabel={a.date_label}
+              readingMin={a.reading_min}
+              commentCount={a.comment_count}
+              coverImageUrl={a.cover_image_url}
+            />
+            {(i + 1) % 5 === 0 && i + 1 < articles.length && (
+              <NewsletterCTA variant="inline" />
+            )}
+          </Fragment>
         ))
       )}
     </div>

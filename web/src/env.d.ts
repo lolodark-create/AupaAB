@@ -15,6 +15,8 @@ interface ImportMetaEnv {
   readonly MEILISEARCH_ADMIN_KEY: string;
   readonly ANTHROPIC_API_KEY: string;
   readonly RESEND_API_KEY: string;
+  readonly NEWSLETTER_FROM: string;
+  readonly NEWSLETTER_REPLY_TO: string;
   readonly CLOUDINARY_API_KEY: string;
   readonly CLOUDINARY_API_SECRET: string;
   readonly RECAPTCHA_SECRET: string;

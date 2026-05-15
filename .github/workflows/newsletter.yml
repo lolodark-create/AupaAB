@@ -1,0 +1,37 @@
+name: Send daily newsletter
+
+# 7:00 UTC = 8:00 CET (winter) / 9:00 CEST (summer Paris). The crawl runs
+# every 15 minutes by then, so the day's articles are already ingested,
+# deduped, synthesized, and titled.
+
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch: {}
+
+concurrency:
+  group: newsletter-${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: crawler/package-lock.json
+      - run: npm ci --prefix crawler
+      - name: Send digest
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL || 'https://aupa-ab.vercel.app' }}
+          NEWSLETTER_FROM: ${{ vars.NEWSLETTER_FROM }}
+          NEWSLETTER_REPLY_TO: ${{ vars.NEWSLETTER_REPLY_TO }}
+        run: node crawler/scripts/send-newsletter.mjs

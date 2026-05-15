@@ -229,9 +229,11 @@ export async function searchArticles(q: string, cat?: ArticleCategory, src?: str
     id: r.id as string,
     slug: r.slug as string,
     title: r.title as string,
-    // search_articles RPC doesn't return ai_title yet — falls back to title
-    // on cards. To surface AUPA titles in search, extend the RPC signature.
+    // search_articles RPC doesn't return ai_title/ai_synthesis yet — falls
+    // back to title + excerpt on cards. To surface AUPA copy in search,
+    // extend the RPC signature.
     ai_title: null,
+    ai_synthesis: null,
     excerpt: r.excerpt as string,
     author: r.author as string | null,
     published_at: r.published_at as string,

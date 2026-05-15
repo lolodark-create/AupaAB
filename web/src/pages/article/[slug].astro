@@ -2,6 +2,7 @@
 import SiteShell from '~/layouts/SiteShell.astro';
 import ArticleCard from '~/components/ArticleCard.astro';
 import ArticleThumb from '~/components/ArticleThumb.astro';
+import NewsletterCTA from '~/components/NewsletterCTA.astro';
 import Badge from '~/components/atoms/Badge.astro';
 import Button from '~/components/atoms/Button.astro';
 import SourceChip from '~/components/atoms/SourceChip.astro';
@@ -187,6 +188,10 @@ const recent = otherArticles.slice(0, 6);
           >#{t}</a>
         ))}
       </div>
+
+      {/* Newsletter CTA — reader's already engaged enough to reach the
+          bottom of an article; high-intent moment to ask for the email. */}
+      <NewsletterCTA variant="article" class="mt-10" />
 
       {/* Action bar (no comments in V1; share + bookmark V1.5+) */}
       <div class="mt-8 py-4 border-t border-b border-border-subtle flex gap-4 items-center">

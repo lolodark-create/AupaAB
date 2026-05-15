@@ -1,0 +1,106 @@
+---
+// Newsletter signup landing — full-bleed promo page used by every CTA on
+// the site. Form submits to /api/newsletter/subscribe, shows a flash
+// state in place (no page reload).
+import SiteShell from '~/layouts/SiteShell.astro';
+---
+
+<SiteShell
+  title="La brève du matin"
+  description="Chaque matin à 8h, les 3 actus AB à retenir, en deux phrases pour chacune. Pas de pub, pas de pisteur, désabonnement en un clic."
+>
+  <div class="max-w-reading mx-auto px-4 md:px-6 pt-10 md:pt-16 pb-20">
+    <span class="t-meta text-aviron">Newsletter</span>
+    <h1 class="mt-1 mb-4 font-serif font-semibold text-[36px] md:text-[52px] leading-[1.04] tracking-[-0.015em]" style="font-variation-settings:'opsz' 144, 'SOFT' 40; text-wrap:balance;">
+      8 h. Trois articles. Deux phrases chacun.
+    </h1>
+    <p class="text-[17px] md:text-[19px] leading-[1.55] text-fg-secondary mb-8">
+      Chaque matin, on lit les six médias qui parlent de l'Aviron Bayonnais et on te résume les <strong class="text-fg">3 articles qui méritent ta minute</strong>. Pas de pub, pas de tracker, pas de "et n'oubliez pas de cliquer". Désabonnement en un clic.
+    </p>
+
+    <form id="newsletter-form" class="flex flex-col sm:flex-row gap-3 mb-3" novalidate>
+      <input
+        type="email"
+        name="email"
+        required
+        placeholder="ton@email.com"
+        autocomplete="email"
+        class="flex-1 px-4 py-3 text-[16px] bg-bg-elevated border border-border-default rounded-md text-fg placeholder:text-fg-tertiary focus:outline-none focus:border-aviron focus:ring-2 focus:ring-aviron/30"
+      />
+      <button
+        type="submit"
+        class="px-6 py-3 bg-aviron text-white dark:text-night font-semibold text-[15px] rounded-md hover:bg-aviron-press transition-colors whitespace-nowrap"
+      >
+        Je m'abonne
+      </button>
+    </form>
+    <p id="newsletter-feedback" class="m-0 text-[13px] min-h-[20px]" role="status" aria-live="polite"></p>
+
+    <div class="grid grid-cols-3 gap-3 md:gap-6 mt-12 mb-14">
+      {[
+        { kpi: '8 h', label: 'tous les matins' },
+        { kpi: '3', label: 'articles seulement' },
+        { kpi: '0', label: 'pub, 0 tracker' },
+      ].map((s) => (
+        <div class="px-4 py-5 bg-bg-subtle rounded-lg text-center">
+          <div class="font-serif font-semibold text-[28px] md:text-[36px] leading-none text-aviron tnum">{s.kpi}</div>
+          <div class="text-[12px] md:text-[13px] text-fg-secondary mt-2">{s.label}</div>
+        </div>
+      ))}
+    </div>
+
+    <div class="space-y-5 text-[15px] leading-[1.6] text-fg-secondary">
+      <p>
+        <strong class="text-fg">Pourquoi cette newsletter ?</strong> Parce qu'on a fait le calcul : six médias × cinq articles par jour = trente. Personne n'a le temps. On lit pour toi et on te garde le meilleur.
+      </p>
+      <p>
+        <strong class="text-fg">Pourquoi gratuit ?</strong> Parce qu'on est nous-mêmes supporters et qu'on veut juste partager. La newsletter restera gratuite pour les lecteurs.
+      </p>
+      <p>
+        <strong class="text-fg">Et la vie privée ?</strong> Ton e-mail vit en France, sur Supabase EU-Paris. On ne le revend pas, on ne le partage pas. Tu te désinscris en un clic, sans nous demander pourquoi.
+      </p>
+    </div>
+  </div>
+</SiteShell>
+
+<script is:inline>
+  (function () {
+    const form = document.getElementById('newsletter-form');
+    const feedback = document.getElementById('newsletter-feedback');
+    if (!form || !feedback) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = form.querySelector('input[name="email"]').value;
+      const button = form.querySelector('button');
+      button.disabled = true;
+      button.textContent = 'Envoi...';
+      feedback.className = 'm-0 text-[13px] min-h-[20px] text-fg-secondary';
+      feedback.textContent = '';
+
+      try {
+        const res = await fetch('/api/newsletter/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, source_hint: 'newsletter-page' }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          form.style.display = 'none';
+          feedback.className = 'm-0 text-[15px] min-h-[20px] text-success font-medium';
+          feedback.innerHTML = '✓ Vérifie ta boîte — on vient de t\'envoyer un lien de confirmation.';
+        } else {
+          feedback.className = 'm-0 text-[13px] min-h-[20px] text-danger';
+          feedback.textContent = data.error || 'Une erreur est survenue.';
+          button.disabled = false;
+          button.textContent = 'Je m\'abonne';
+        }
+      } catch (err) {
+        feedback.className = 'm-0 text-[13px] min-h-[20px] text-danger';
+        feedback.textContent = 'Erreur réseau, réessaie.';
+        button.disabled = false;
+        button.textContent = 'Je m\'abonne';
+      }
+    });
+  })();
+</script>
