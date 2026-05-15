@@ -40,10 +40,22 @@ const STRONG_PHRASES = [
 ];
 
 // AB roster surnames (May 2026). Keep maintained per mercato cycle.
+// Rule of thumb: include if the surname is distinctive enough that an
+// article titled around just "<Surname>: …" would clearly be about an AB
+// player. Skip overly common ones (Germain, Bernard, etc.) where a title
+// like "Saint-Germain : ..." would slip through.
 const AB_NAMES = [
-  'maka', 'lopez', 'gorgadze', 'tuilagi', 'spedding', 'umaga',
-  'patat', 'aldige', 'heguy', 'capilla', 'segonds', 'tatafu',
-  'erbinartegaray', 'moretti', 'bruni',
+  // Forwards
+  'maka', 'gorgadze', 'tuilagi', 'tatafu', 'capilla', 'bruni',
+  // Backs
+  'lopez', 'spedding', 'umaga', 'aldige', 'heguy', 'segonds',
+  'erbinartegaray', 'moretti',
+  // Demis-de-mêlée
+  'machenaud', 'jantjies', 'jantjie', 'tilloles',
+  // Coaches / staff
+  'patat', 'pirlet',
+  // Other distinctive surnames in the roster
+  'daunivucu',
 ];
 
 // If the title names another Top 14 / Pro D2 club, the article is almost

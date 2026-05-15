@@ -48,11 +48,15 @@ const OPPONENTS = [
   ['biarritz',     /\bbiarritz\s+olympique\b/],
 ];
 
+// Kept in sync with ingest-once.mjs::AB_NAMES, plus a few "passing names"
+// that show up as transfer rumors / one-off mentions (tambwe, orabe…).
 const PLAYERS = [
   'maka', 'lopez', 'gorgadze', 'tuilagi', 'spedding', 'umaga',
   'patat', 'aldige', 'heguy', 'capilla', 'segonds', 'tatafu',
   'erbinartegaray', 'moretti', 'bruni', 'tambwe', 'jantjies', 'jantjie',
   'orabe', 'maqala', 'teillery',
+  // Added with the V1.1 roster review.
+  'machenaud', 'tilloles', 'pirlet', 'daunivucu',
 ];
 
 export function classify(article) {
