@@ -8,6 +8,8 @@ interface ImportMetaEnv {
   readonly PUBLIC_MEILISEARCH_SEARCH_KEY: string;
   readonly PUBLIC_CLOUDINARY_CLOUD_NAME: string;
   readonly PUBLIC_PLAUSIBLE_DOMAIN: string;
+  readonly PUBLIC_UMAMI_SCRIPT_URL: string;
+  readonly PUBLIC_UMAMI_WEBSITE_ID: string;
   readonly PUBLIC_ADSENSE_CLIENT: string;
   readonly PUBLIC_GA4_ID: string;
 

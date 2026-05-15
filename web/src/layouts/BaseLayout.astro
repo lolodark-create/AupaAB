@@ -41,6 +41,12 @@ const finalOg = ogImage ?? `${siteUrl}/og-default.svg`;
 
 // Plausible (cookieless, exempt from strict CNIL consent). Loaded directly when configured.
 const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
+
+// Umami self-hosted analytics — privacy-first, no cookies, no consent
+// banner required. Configured via two PUBLIC_ env vars so they're inlined
+// at build time and shipped as attributes.
+const umamiSrc = import.meta.env.PUBLIC_UMAMI_SCRIPT_URL;
+const umamiWebsiteId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
 ---
 
 <!doctype html>
@@ -109,6 +115,10 @@ const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
 
     {plausibleDomain && (
       <script is:inline defer src="https://plausible.io/js/script.js" data-domain={plausibleDomain}></script>
+    )}
+
+    {umamiSrc && umamiWebsiteId && (
+      <script is:inline defer src={umamiSrc} data-website-id={umamiWebsiteId}></script>
     )}
 
     <!-- Theme bootstrap (no flash) -->
