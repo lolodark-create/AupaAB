@@ -48,16 +48,20 @@ const STRONG_PHRASES = [
 // Also skip overly common surnames (Germain, Bernard, etc.).
 const AB_NAMES = [
   // Forwards
-  'maka', 'gorgadze', 'tuilagi', 'tatafu', 'capilla', 'bruni',
+  'maka', 'tuilagi', 'tatafu', 'capilla', 'bruni',
   // Backs
-  'lopez', 'spedding', 'umaga', 'heguy', 'segonds',
-  'erbinartegaray', 'moretti',
+  'lopez', 'heguy', 'segonds', 'erbinartegaray', 'moretti',
   // Demis-de-mêlée
   'machenaud', 'jantjies', 'jantjie', 'tilloles',
   // Coaches / staff
   'patat', 'pirlet',
   // Other distinctive surnames in the roster
   'daunivucu',
+  // Removed (former-player false-positive trap):
+  // - 'gorgadze'  → Beka Gorgadze plays for Section Paloise, not AB
+  // - 'spedding'  → Scott Spedding retired ~2022
+  // - 'umaga'     → Tana Umaga's link to AB never materialized
+  // - 'aldige'    → ex-AB, now president of Nissa Rugby since 2009
 ];
 
 // If the title names another Top 14 / Pro D2 club, the article is almost
