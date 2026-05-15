@@ -3,52 +3,81 @@ import SiteShell from '~/layouts/SiteShell.astro';
 import Prose from '~/components/Prose.astro';
 ---
 
-<SiteShell title="Cookies & traceurs" description="La liste exhaustive de ce qu'on dépose dans votre navigateur.">
-  <Prose title="Cookies & traceurs" kicker="Transparence" updated="14 mai 2026">
-    <h2>En V1 — aucun cookie tiers</h2>
+<SiteShell title="Cookies & traceurs" description="La liste exhaustive de ce que le site dépose dans votre navigateur. Spoiler : zéro cookie en V1.">
+  <Prose title="Cookies & traceurs" kicker="Transparence" updated="15 mai 2026">
+    <h2>En V1, le site ne dépose AUCUN cookie</h2>
     <p>
-      AUPA AB n'utilise <strong>aucun cookie tiers</strong> dans sa version actuelle. Notre seule mesure d'audience est <a href="https://plausible.io" target="_blank" rel="noopener">Plausible Analytics</a>, qui fonctionne <em>sans cookie ni identifiant individuel</em>, en agrégat anonyme côté serveur.
+      AUPA AB ne dépose aucun cookie HTTP, ni de premier ni de tiers. Notre mesure d'audience est <strong>Umami</strong> (auto-hébergée par nos soins en Europe), qui fonctionne <em>sans cookie ni identifiant individuel</em>, en mesurant des agrégats anonymes côté serveur — conformément aux recommandations CNIL pour la mesure d'audience exemptée de consentement.
+    </p>
+    <p>
+      C'est pour ça que vous ne voyez pas de bannière "Accepter les cookies" en arrivant.
     </p>
 
-    <h2>Cookies fonctionnels (sans consentement)</h2>
-    <table class="w-full text-[14px] border-collapse">
+    <h2>Stockage local (technique, sans cookie)</h2>
+    <p>
+      Le site utilise un seul élément stocké côté navigateur, en <code>localStorage</code> (et non en cookie). Il ne sort jamais de votre appareil, n'est lu par personne d'autre que votre propre navigateur, et n'est pas soumis à consentement.
+    </p>
+    <table>
       <thead>
-        <tr class="border-b border-border-default">
-          <th class="text-left py-2">Nom</th>
-          <th class="text-left py-2">Origine</th>
-          <th class="text-left py-2">Finalité</th>
-          <th class="text-left py-2">Durée</th>
+        <tr>
+          <th>Clé</th>
+          <th>Origine</th>
+          <th>Finalité</th>
+          <th>Durée</th>
         </tr>
       </thead>
       <tbody>
-        <tr class="border-b border-border-subtle">
-          <td class="py-2"><code>aupa-theme</code></td>
-          <td>AUPA AB (localStorage, pas un cookie HTTP)</td>
-          <td>Mémorise votre choix clair / sombre</td>
-          <td>Permanent (vous pouvez l'effacer)</td>
-        </tr>
-        <tr class="border-b border-border-subtle">
-          <td class="py-2"><code>klaro</code></td>
+        <tr>
+          <td><code>aupa-theme</code></td>
           <td>AUPA AB</td>
-          <td>Mémorise vos choix CMP</td>
-          <td>1 an</td>
+          <td>Mémorise votre préférence thème clair / sombre</td>
+          <td>Permanente (vous pouvez l'effacer dans les paramètres du navigateur)</td>
         </tr>
       </tbody>
     </table>
 
-    <h2>Cookies avec consentement (V2)</h2>
+    <h2>Cookies à venir (V1.5+)</h2>
     <p>
-      À partir de la V2 (commentaires + publicité), des cookies optionnels seront proposés :
+      Quand la fonctionnalité de <strong>compte utilisateur</strong> sera activée (V1.5), les cookies de session Supabase Auth seront ajoutés. Ils ne se déclencheront que pour les utilisateurs connectés, et seront strictement nécessaires au fonctionnement de la session.
     </p>
-    <ul>
-      <li><strong>Session</strong> (fonctionnel, requis si compte) : <code>sb-access-token</code>, <code>sb-refresh-token</code>. Durée : 7 jours, renouvelables.</li>
-      <li><strong>Google AdSense</strong> (marketing) : <code>__gads</code>, <code>IDE</code>, <code>test_cookie</code>. Durée : 2 ans. Activé uniquement si consentement.</li>
-      <li><strong>Google Analytics 4</strong> (analytics) : <code>_ga</code>, <code>_gid</code>. Désactivé par défaut.</li>
-    </ul>
-
-    <h2>Gérer vos préférences</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Cookie (futur)</th>
+          <th>Finalité</th>
+          <th>Durée</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>sb-access-token</code></td>
+          <td>Session connectée (Supabase Auth)</td>
+          <td>1 heure</td>
+        </tr>
+        <tr>
+          <td><code>sb-refresh-token</code></td>
+          <td>Renouvellement de session</td>
+          <td>7 jours</td>
+        </tr>
+      </tbody>
+    </table>
     <p>
-      Vous pouvez modifier vos choix à tout moment via le bouton "Cookies" en pied de page (CMP Klaro!).
+      Comme ces cookies sont <em>strictement nécessaires</em> à la fonctionnalité demandée par l'utilisateur (rester connecté), ils ne nécessitent pas de consentement préalable au sens du RGPD.
+    </p>
+
+    <h2>Pas de publicité, pas de retargeting</h2>
+    <p>
+      AUPA AB n'a pas de modèle économique publicitaire. Il n'y a donc aucun cookie marketing, aucun pixel de tracking, aucun retargeting. La newsletter est gratuite parce qu'on l'envoie nous-mêmes — pas parce qu'on revend vos données.
+    </p>
+
+    <h2>Comment vérifier par vous-même</h2>
+    <p>
+      Ouvrez les outils de développement de votre navigateur (F12 sur Chrome/Firefox) → onglet <strong>Application</strong> (Chrome) ou <strong>Stockage</strong> (Firefox) → <strong>Cookies</strong> → <code>https://aupaab.fr</code>. La liste sera vide.
+    </p>
+
+    <h2>Pour aller plus loin</h2>
+    <p>
+      Voir notre <a href="/confidentialite">politique de confidentialité</a> pour le détail des données traitées et de vos droits RGPD.
     </p>
   </Prose>
 </SiteShell>

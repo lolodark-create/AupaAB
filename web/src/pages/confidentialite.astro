@@ -3,67 +3,118 @@ import SiteShell from '~/layouts/SiteShell.astro';
 import Prose from '~/components/Prose.astro';
 ---
 
-<SiteShell title="Politique de confidentialité" description="Comment nous traitons vos données, vos droits RGPD.">
-  <Prose title="Politique de confidentialité" kicker="RGPD" updated="14 mai 2026">
-    <blockquote>
-      <strong>À faire relire par un juriste avant production.</strong>
-    </blockquote>
+<SiteShell title="Politique de confidentialité" description="Comment AUPA AB traite vos données — droits RGPD, sous-traitants, durées de conservation.">
+  <Prose title="Politique de confidentialité" kicker="RGPD" updated="15 mai 2026">
+    <p>
+      AUPA AB respecte le Règlement général sur la protection des données (RGPD, règlement (UE) 2016/679) et la Loi Informatique et Libertés modifiée. La présente politique décrit, en langage clair, les données collectées sur <a href="https://aupaab.fr">aupaab.fr</a>, leur traitement, vos droits et nos sous-traitants.
+    </p>
 
     <h2>Responsable du traitement</h2>
     <p>
-      [À compléter — voir mentions légales]
+      <strong>AUPA AB</strong> — agrégateur d'actualités non-officiel de l'Aviron Bayonnais. Détails complets (statut juridique, siège, directeur de la publication) sur la page <a href="/mentions-legales">mentions légales</a>.
     </p>
-
-    <h2>Délégué à la protection des données (DPO)</h2>
     <p>
-      <a href="mailto:dpo@aupaab.fr">dpo@aupaab.fr</a>
+      Contact général : <a href="mailto:contact@aupaab.fr">contact@aupaab.fr</a><br />
+      Contact DPO / vie privée : <a href="mailto:dpo@aupaab.fr">dpo@aupaab.fr</a>
     </p>
 
-    <h2>Données collectées en V1 (sans compte)</h2>
+    <h2>Données que nous collectons (V1)</h2>
+
+    <h3>Si vous visitez le site sans rien faire</h3>
     <ul>
-      <li><strong>Analytics anonymisées via Plausible</strong> : pas de cookie, pas d'identifiant, anonymisation IP au niveau du serveur. Conforme RGPD sans consentement strict.</li>
-      <li><strong>Logs serveur techniques</strong> : adresse IP, user-agent, route consultée. Conservés 30 jours pour détection d'abus, puis supprimés.</li>
+      <li><strong>Analytics anonymes via Umami</strong> (auto-hébergé en UE) : URL visitée, pays, navigateur, source de trafic. <strong>Aucun cookie, aucun identifiant individuel, IP non stockée.</strong> Conforme RGPD sans nécessité de consentement (recommandation CNIL "mesure d'audience exemptée").</li>
+      <li><strong>Logs serveur techniques</strong> (Vercel) : IP, user-agent, route, code HTTP. Conservés 30 jours pour détection d'abus, puis purgés automatiquement.</li>
     </ul>
 
-    <h2>Données collectées en V1.5 (avec compte)</h2>
+    <h3>Si vous vous inscrivez à la newsletter</h3>
     <ul>
-      <li>Email (obligatoire pour la création de compte)</li>
-      <li>Pseudo (obligatoire)</li>
-      <li>Nom affiché, bio, année supporter, joueur préféré (facultatif)</li>
-      <li>Articles sauvegardés (privés)</li>
-      <li>Préférences de notification</li>
+      <li><strong>Adresse e-mail</strong> (obligatoire) — pour vous envoyer la brève.</li>
+      <li><strong>Date d'inscription, source de signup, IP, user-agent</strong> au moment du signup — anti-abus uniquement.</li>
+      <li><strong>Token de désinscription</strong> — généré aléatoirement, permet le désabo en 1 clic.</li>
+      <li><strong>Date du dernier e-mail envoyé</strong> — pour éviter les doubles envois.</li>
     </ul>
+    <p>
+      Base légale : votre consentement explicite (case "Je m'abonne" + confirmation par e-mail). Conservation : tant que votre inscription est active. Suppression automatique si vous cliquez "Se désinscrire" dans n'importe quel e-mail.
+    </p>
 
     <h2>Cookies</h2>
     <p>
-      Voir notre <a href="/cookies">page cookies dédiée</a>.
+      <strong>En V1, le site ne dépose AUCUN cookie.</strong> Détails sur la <a href="/cookies">page cookies dédiée</a>.
     </p>
 
     <h2>Vos droits</h2>
+    <p>Conformément au RGPD, vous disposez à tout moment des droits suivants :</p>
     <ul>
-      <li><strong>Accès</strong> : vous pouvez demander un export complet de vos données (JSON) via <code>/api/auth/export-data</code> une fois connecté (V1.5+).</li>
-      <li><strong>Rectification</strong> : page <code>/mon-compte</code>.</li>
-      <li><strong>Effacement</strong> : bouton "Supprimer mon compte" qui cascade tous les contenus rattachés. Les commentaires publics sont anonymisés (auteur → "[supprimé]").</li>
-      <li><strong>Portabilité</strong> : l'export JSON est portable.</li>
-      <li><strong>Opposition</strong> : toggle dans <code>/mon-compte/notifications</code>.</li>
-      <li><strong>Réclamation</strong> : auprès de la CNIL, <a href="https://www.cnil.fr" target="_blank" rel="noopener">cnil.fr</a>.</li>
+      <li><strong>Accès</strong> — savoir quelles données nous détenons sur vous. Email à <a href="mailto:dpo@aupaab.fr">dpo@aupaab.fr</a>, réponse sous 30 jours.</li>
+      <li><strong>Rectification</strong> — corriger une donnée inexacte. Même contact.</li>
+      <li><strong>Effacement</strong> — supprimer définitivement vos données. Pour la newsletter : 1 clic sur "Se désinscrire" dans n'importe quel e-mail. Pour les logs serveur : suppression automatique à 30 jours.</li>
+      <li><strong>Portabilité</strong> — recevoir vos données dans un format structuré (JSON). Email à <a href="mailto:dpo@aupaab.fr">dpo@aupaab.fr</a>.</li>
+      <li><strong>Opposition</strong> — refuser un traitement. Pour la newsletter : désinscription en 1 clic.</li>
+      <li><strong>Réclamation</strong> — saisir l'autorité de contrôle : <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">cnil.fr</a> ou par courrier (CNIL, 3 place de Fontenoy, 75007 Paris).</li>
     </ul>
 
     <h2>Sous-traitants</h2>
+    <p>
+      Pour faire fonctionner le service, nous utilisons les prestataires suivants. Chacun est tenu par contrat (DPA) de traiter vos données uniquement pour notre compte et de respecter le RGPD.
+    </p>
     <ul>
-      <li>Hébergement front : Vercel (USA, clauses contractuelles types).</li>
-      <li>Base de données : Supabase (Singapour, idem).</li>
-      <li>Email transactionnel : Resend (USA, idem).</li>
-      <li>Analytics : Plausible (Europe).</li>
-      <li>Modération IA : Anthropic (USA — données envoyées : contenu du commentaire uniquement, pas d'identité).</li>
+      <li><strong>Vercel Inc.</strong> (États-Unis) — hébergement du site. Données : logs techniques. Garanties : clauses contractuelles types (CCT) UE.</li>
+      <li><strong>Supabase Inc.</strong> (siège social Singapour, infrastructure AWS région <code>eu-west-3</code> à <strong>Paris</strong>) — base de données. Données : emails newsletter, tokens, logs d'inscription. Vos données restent en UE.</li>
+      <li><strong>Resend</strong> (États-Unis, infrastructure UE <code>eu-west-1</code> à Dublin) — envoi des e-mails newsletter. Données : adresse e-mail uniquement. Garanties : CCT UE.</li>
+      <li><strong>Anthropic PBC</strong> (États-Unis) — génération des synthèses IA des articles (Claude Haiku). Données envoyées : <em>uniquement le titre et l'extrait public de l'article source</em>, jamais vos données personnelles. Garanties : CCT UE.</li>
+      <li><strong>GitHub Inc.</strong> (États-Unis, filiale Microsoft) — automatisation des crawls et envois newsletter (GitHub Actions). Données : aucune donnée perso, juste l'exécution de scripts. Garanties : CCT UE.</li>
+      <li><strong>Meta Platforms Inc.</strong> (États-Unis) — publication d'un résumé quotidien sur notre <a href="https://www.facebook.com/AupaAB/" target="_blank" rel="noopener noreferrer">page Facebook AUPA AB</a>. Aucune donnée des visiteurs du site n'est envoyée à Meta — seulement le contenu éditorial du jour.</li>
     </ul>
 
+    <h2>Transferts hors UE</h2>
+    <p>
+      Vercel, Resend (siège), Anthropic, GitHub et Meta sont des entreprises américaines. Les transferts de données vers les États-Unis sont encadrés par les <strong>clauses contractuelles types</strong> de la Commission européenne (décision 2021/914) et, pour les sous-traitants éligibles, par le <em>Data Privacy Framework</em> UE-USA.
+    </p>
+
     <h2>Durée de conservation</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Donnée</th>
+          <th>Durée</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>E-mail newsletter</td>
+          <td>Jusqu'à désinscription</td>
+        </tr>
+        <tr>
+          <td>Logs serveur (IP, route)</td>
+          <td>30 jours, puis purge automatique</td>
+        </tr>
+        <tr>
+          <td>Analytics Umami (anonymes)</td>
+          <td>13 mois (recommandation CNIL)</td>
+        </tr>
+        <tr>
+          <td>Données après désinscription</td>
+          <td>Suppression définitive sous 7 jours</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Sécurité</h2>
     <ul>
-      <li>Compte actif : tant que le compte est actif.</li>
-      <li>Compte inactif > 24 mois : email d'avertissement puis suppression.</li>
-      <li>Logs serveur : 30 jours.</li>
-      <li>Logs de modération : 12 mois.</li>
+      <li>HTTPS obligatoire (TLS 1.3) sur l'ensemble du site et des API.</li>
+      <li>Mots de passe et tokens stockés chiffrés (au repos en base, en transit en HTTPS).</li>
+      <li>Accès aux données : limité aux administrateurs techniques nommés.</li>
+      <li>Sauvegardes chiffrées de la base de données (rétention 7 jours).</li>
     </ul>
+
+    <h2>Évolutions à venir (V1.5+)</h2>
+    <p>
+      Quand la fonctionnalité <strong>compte utilisateur</strong> sera activée (V1.5), nous collecterons en plus : pseudo, mot de passe haché (Argon2), liste de bookmarks, préférences. Quand les <strong>commentaires</strong> seront activés (V2), le contenu des commentaires passera par <strong>Anthropic</strong> pour modération automatique (sans envoi de l'identité de l'auteur). Cette politique sera mise à jour <em>avant</em> activation, avec notification aux abonnés newsletter.
+    </p>
+
+    <h2>Modifications de cette politique</h2>
+    <p>
+      Toute modification substantielle sera signalée en haut de cette page et, si vous êtes inscrit à la newsletter, par e-mail au moins 15 jours avant entrée en vigueur. La date de dernière mise à jour figure en tête du document.
+    </p>
   </Prose>
 </SiteShell>

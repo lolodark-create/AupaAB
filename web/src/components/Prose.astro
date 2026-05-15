@@ -61,4 +61,32 @@ const { title, kicker, updated } = Astro.props;
     font-style: italic;
     color: rgb(var(--fg-secondary));
   }
+  .prose-institutional :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 1.5rem;
+    font-size: 0.9375rem;
+  }
+  .prose-institutional :global(th),
+  .prose-institutional :global(td) {
+    text-align: left;
+    padding: 0.625rem 0.75rem;
+    border-bottom: 1px solid rgb(var(--border-subtle));
+    vertical-align: top;
+  }
+  .prose-institutional :global(th) {
+    font-weight: 600;
+    color: rgb(var(--fg-secondary));
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.75rem;
+    border-bottom-color: rgb(var(--border-default));
+  }
+  .prose-institutional :global(code) {
+    font-family: ui-monospace, 'SF Mono', 'Menlo', monospace;
+    font-size: 0.875em;
+    padding: 0.1em 0.35em;
+    background: rgb(var(--bg-subtle));
+    border-radius: 3px;
+  }
 </style>
