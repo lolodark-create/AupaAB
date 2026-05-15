@@ -11,12 +11,15 @@ interface Props {
 }
 const { variant, class: className } = Astro.props;
 
+// Same headline across placements (mirrors /newsletter and the email
+// subject) so the message lands consistently. Body and CTA shift per
+// context — inline in the feed is the lightest, footer the most explicit.
 const copy = {
   inline:  {
     kicker: 'Newsletter',
-    title:  'Tout l\'AB du jour, dans ta boîte à 8 h.',
-    body:   'Huit médias, dédupliqués, synthétisés. L\'exhaustivité de la veille en une seule lecture.',
-    cta:    'Je m\'abonne',
+    title:  'Toute l\'actu de l\'Aviron, dans tes mails à 8 h.',
+    body:   'Pour ne plus avoir à scroller : tous les articles AB de la veille, déjà synthétisés.',
+    cta:    'M\'abonner',
   },
   footer:  {
     kicker: 'La brève AUPA AB',
@@ -25,9 +28,9 @@ const copy = {
     cta:    'Je m\'abonne — gratuit',
   },
   article: {
-    kicker: 'Avant de partir',
-    title:  'Tu veux pas en rater un seul ?',
-    body:   'Reçois tous les articles AB de la veille chaque matin à 8 h, déjà synthétisés. Ça t\'évitera de revenir dix fois.',
+    kicker: 'Et tous les autres ?',
+    title:  'Toute l\'actu de l\'Aviron, dans tes mails à 8 h.',
+    body:   'Tu viens d\'en lire un. Reçois tous les articles AB du jour, dans un seul mail à 8 h.',
     cta:    'M\'abonner',
   },
 }[variant];
