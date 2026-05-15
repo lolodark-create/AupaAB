@@ -1,11 +1,12 @@
 name: Post daily digest to Facebook
 
-# 08:05 UTC = 09:05 CET / 10:05 CEST. Fires 5 min after the newsletter
-# so the page audience sees value but readers wanting it first → signup.
-
+# Manual-only until the post format is fully validated. The auto-schedule
+# below is intentionally commented out — re-enable when the template is
+# locked in and you're OK with daily fire-and-forget. Trigger manually
+# via the Actions tab (workflow_dispatch).
 on:
-  schedule:
-    - cron: '5 7 * * *'
+  # schedule:
+  #   - cron: '5 7 * * *'
   workflow_dispatch: {}
 
 concurrency:

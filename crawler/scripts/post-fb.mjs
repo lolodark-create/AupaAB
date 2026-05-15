@@ -44,39 +44,24 @@ if (articles.length === 0) {
   process.exit(0);
 }
 
-const CAT_LABEL = {
-  match: '🏉 Match', mercato: '✍️ Mercato', coulisses: '👁 Coulisses',
-  espoirs: '🌱 Espoirs', pays_basque: '🏴 Pays Basque', autre: '📰 Brèves',
-};
-const CAT_ORDER = ['match', 'mercato', 'coulisses', 'espoirs', 'pays_basque', 'autre'];
-const byCategory = new Map();
-for (const a of articles) {
-  if (!byCategory.has(a.category)) byCategory.set(a.category, []);
-  byCategory.get(a.category).push(a);
-}
-
-// Compose the post body. FB's "see more" cuts ~480 chars on mobile, so
-// we front-load the hook + first article, then expand.
+// Voice = same supporter-first-person tone as the AI synthesis. No emojis,
+// no horizontal-bar separators, no bullets. Articles flow as short
+// paragraphs with double-line breaks — reads like a person posting on
+// his Page, not a content bot.
 const hook = articles.length === 1
-  ? `📍 Aujourd'hui sur AUPA AB :`
-  : `📍 Les ${articles.length} articles AB du jour (en quelques mots) :`;
+  ? `Ce qui sort aujourd'hui sur l'Aviron Bayonnais.`
+  : `Tout ce qui sort aujourd'hui sur l'Aviron Bayonnais. ${articles.length} articles, résumés en deux phrases pour chacun.`;
 
-const sections = CAT_ORDER
-  .filter((c) => byCategory.has(c))
-  .map((cat) => {
-    const items = byCategory.get(cat);
-    const lines = items.map((a) => {
-      const headline = a.ai_title || a.title;
-      const synth = (a.ai_synthesis || a.excerpt || '').slice(0, 180);
-      const url = `${SITE_URL}/article/${a.slug}`;
-      return `• ${headline}\n  ${synth}\n  → ${url}`;
-    }).join('\n\n');
-    return `\n━━━ ${CAT_LABEL[cat] || cat.toUpperCase()} ━━━\n\n${lines}`;
-  }).join('\n');
+const blocks = articles.map((a) => {
+  const headline = a.ai_title || a.title;
+  const synth = (a.ai_synthesis || a.excerpt || '').trim();
+  const url = `${SITE_URL}/article/${a.slug}`;
+  return `${headline}\n${synth}\n${url}`;
+}).join('\n\n\n');
 
-const cta = `\n\n━━━━━━━━━━\n\n📩 Tu veux le recevoir directement par mail à 8 h, chaque matin ? Inscription en 30 secondes :\n${SITE_URL}/newsletter\n\n🔗 Voir tout sur ${SITE_URL.replace('https://', '')}`;
+const cta = `Tu peux les recevoir par mail à 8 h chaque matin, dès la sortie :\n${SITE_URL}/newsletter`;
 
-const message = `${hook}\n${sections}${cta}`;
+const message = `${hook}\n\n\n${blocks}\n\n\n—\n\n${cta}`;
 
 // FB posts cap at ~63 000 chars in the Graph API but the "see more" cuts
 // long content — for ergonomics we soft-cap at ~5000.
