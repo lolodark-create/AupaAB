@@ -52,10 +52,11 @@ const OPPONENTS = [
 // that show up as transfer rumors / one-off mentions (tambwe, orabe…).
 const PLAYERS = [
   'maka', 'lopez', 'gorgadze', 'tuilagi', 'spedding', 'umaga',
-  'patat', 'aldige', 'heguy', 'capilla', 'segonds', 'tatafu',
+  'patat', 'heguy', 'capilla', 'segonds', 'tatafu',
   'erbinartegaray', 'moretti', 'bruni', 'tambwe', 'jantjies', 'jantjie',
   'orabe', 'maqala', 'teillery',
-  // Added with the V1.1 roster review.
+  // Added with the V1.1 roster review. Removed 'aldige' (Nissa president
+  // since 2009 — was a false-positive trap for an ex-AB player).
   'machenaud', 'tilloles', 'pirlet', 'daunivucu',
 ];
 

@@ -40,15 +40,17 @@ const STRONG_PHRASES = [
 ];
 
 // AB roster surnames (May 2026). Keep maintained per mercato cycle.
-// Rule of thumb: include if the surname is distinctive enough that an
-// article titled around just "<Surname>: …" would clearly be about an AB
-// player. Skip overly common ones (Germain, Bernard, etc.) where a title
-// like "Saint-Germain : ..." would slip through.
+// Rule of thumb: include if the surname is distinctive AND the person is
+// CURRENTLY at AB. Former players who now coach/run another club are a
+// classic false-positive trap — e.g. Aldigé (ex-AB player, president of
+// Nissa Rugby since 2009) was wrongly listed and matched a Nationale
+// finale article that had nothing to do with us.
+// Also skip overly common surnames (Germain, Bernard, etc.).
 const AB_NAMES = [
   // Forwards
   'maka', 'gorgadze', 'tuilagi', 'tatafu', 'capilla', 'bruni',
   // Backs
-  'lopez', 'spedding', 'umaga', 'aldige', 'heguy', 'segonds',
+  'lopez', 'spedding', 'umaga', 'heguy', 'segonds',
   'erbinartegaray', 'moretti',
   // Demis-de-mêlée
   'machenaud', 'jantjies', 'jantjie', 'tilloles',
@@ -62,12 +64,19 @@ const AB_NAMES = [
 // certainly about that club — even if it mentions an AB player tangentially.
 // Reject UNLESS the title also has "bayonne" or "aviron" (comparison piece).
 const OTHER_CLUB_REJECT = [
+  // Top 14
   'section paloise', 'biarritz olympique', 'stade toulousain', 'stade rochelais',
   'racing 92', 'stade francais', 'castres olympique', 'asm clermont',
   'usa perpignan', 'rc toulon', 'lyon ou', 'montpellier hr', 'union bordeaux',
+  // Pro D2
   'oyonnax rugby', 'us montauban', 'colomiers rugby', 'soyaux angouleme',
   'beziers rugby', 'agen rugby', 'mont de marsan', 'nevers rugby',
   'grenoble fcg', 'aurillac rugby', 'provence rugby', 'rouen normandie',
+  // Nationale (3rd tier) — added after a Nissa-finale article slipped
+  // through because Aldigé (Nissa president) was wrongly in AB_NAMES.
+  'nissa rugby', 'chambery rugby', 'suresnes rugby', 'albi rugby',
+  'valence romans', 'bourg en bresse', 'massy rugby', 'bourgoin',
+  // Shorthand match notations that precede the AB anchor
   'biarritz - ', 'biarritz–', 'bo - ', 'bo–',
 ];
 
