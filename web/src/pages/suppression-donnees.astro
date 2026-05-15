@@ -1,0 +1,55 @@
+---
+import SiteShell from '~/layouts/SiteShell.astro';
+import Prose from '~/components/Prose.astro';
+---
+
+<SiteShell title="Suppression des données" description="Comment supprimer vos données personnelles d'AUPA AB.">
+  <Prose title="Suppression de vos données" kicker="RGPD" updated="15 mai 2026">
+    <p>
+      Vous avez le <strong>droit d'effacement</strong> sur l'ensemble des données personnelles qu'AUPA AB détient sur vous. Voici comment l'exercer, selon ce que vous avez fait sur le site.
+    </p>
+
+    <h2>Si vous êtes abonné à la newsletter</h2>
+    <p>
+      <strong>Méthode 1 — en 1 clic (recommandée)</strong> : ouvrez n'importe quel e-mail que vous avez reçu de la newsletter AUPA AB, descendez tout en bas, cliquez sur <strong>« Se désinscrire en 1 clic »</strong>. Votre adresse e-mail et toutes les données associées sont supprimées sous 7 jours, sans confirmation à votre charge.
+    </p>
+    <p>
+      <strong>Méthode 2 — par e-mail</strong> : écrivez à <a href="mailto:dpo@aupaab.fr">dpo@aupaab.fr</a> avec en objet « Suppression de données » et l'adresse e-mail concernée. Réponse confirmée sous 30 jours (en pratique sous 48 h).
+    </p>
+
+    <h2>Si vous avez juste visité le site</h2>
+    <p>
+      Aucune donnée personnelle n'est stockée. AUPA AB n'utilise pas de cookies et son analytics (Umami auto-hébergé) ne collecte aucun identifiant individuel. Les logs serveur techniques (IP, route) sont purgés automatiquement sous 30 jours. <strong>Aucune action de votre part n'est nécessaire.</strong>
+    </p>
+
+    <h2>Si vous nous avez écrit via le formulaire de contact ou de retrait</h2>
+    <p>
+      Écrivez à <a href="mailto:dpo@aupaab.fr">dpo@aupaab.fr</a> en mentionnant votre nom et la date approximative de votre demande. Nous supprimons l'échange et toute donnée associée sous 30 jours.
+    </p>
+
+    <h2>Ce qui est supprimé exactement</h2>
+    <ul>
+      <li><strong>E-mail de la newsletter</strong> et tous les tokens associés (désinscription, confirmation).</li>
+      <li><strong>Métadonnées d'inscription</strong> : date, IP, user-agent, source du signup.</li>
+      <li><strong>Historique d'envois</strong> : date du dernier e-mail envoyé.</li>
+    </ul>
+    <p>
+      La suppression est définitive et non-réversible. Les logs serveur Vercel (techniques, anonymisés) sont déjà purgés automatiquement à 30 jours.
+    </p>
+
+    <h2>Délais</h2>
+    <ul>
+      <li><strong>Désinscription en 1 clic</strong> : effet immédiat sur l'envoi des e-mails, suppression définitive sous 7 jours.</li>
+      <li><strong>Demande par e-mail</strong> : confirmation sous 30 jours (en pratique sous 48 h).</li>
+    </ul>
+
+    <h2>Réclamation</h2>
+    <p>
+      Si vous estimez que votre droit n'est pas respecté, vous pouvez saisir la <strong>CNIL</strong> : <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">cnil.fr</a> ou par courrier (CNIL, 3 place de Fontenoy, 75007 Paris).
+    </p>
+
+    <p>
+      Pour le détail complet de notre traitement de données, voir notre <a href="/confidentialite">politique de confidentialité</a>.
+    </p>
+  </Prose>
+</SiteShell>
