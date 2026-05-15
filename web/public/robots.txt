@@ -5,4 +5,4 @@ Disallow: /admin/
 Disallow: /mon-compte/
 Disallow: /auth/
 
-Sitemap: https://aupa-ab.com/sitemap-index.xml
+Sitemap: https://aupa-ab.fr/sitemap-index.xml

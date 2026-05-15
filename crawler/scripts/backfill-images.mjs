@@ -40,7 +40,7 @@ async function fetchOgImage(articleUrl) {
   try {
     const res = await fetch(articleUrl, {
       headers: {
-        'User-Agent': 'AUPA-AB-Crawler/0.1 (+https://aupa-ab.com/sources)',
+        'User-Agent': 'AUPA-AB-Crawler/0.1 (+https://aupa-ab.fr/sources)',
         Accept: 'text/html,application/xhtml+xml',
       },
       signal: AbortSignal.timeout(8000),
@@ -71,7 +71,7 @@ async function extractCoverImage(item) {
 
 const sql = postgres(process.env.DATABASE_URL, { ssl: 'require', max: 2, prepare: false });
 const parser = new Parser({
-  headers: { 'User-Agent': 'AUPA-AB-Crawler/0.1 (+https://aupa-ab.com/sources)' },
+  headers: { 'User-Agent': 'AUPA-AB-Crawler/0.1 (+https://aupa-ab.fr/sources)' },
   timeout: FEED_TIMEOUT_MS,
   customFields: {
     item: [

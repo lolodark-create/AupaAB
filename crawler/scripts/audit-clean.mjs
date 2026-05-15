@@ -15,7 +15,7 @@ const MAX_AGE_DAYS = parseInt(process.env.MAX_AGE_DAYS || '21', 10);
 const URL_TIMEOUT_MS = 8000;
 const URL_CONCURRENCY = 8;
 
-const UA = 'AUPA-AB-LinkCheck/0.1 (+https://aupa-ab.com)';
+const UA = 'AUPA-AB-LinkCheck/0.1 (+https://aupa-ab.fr)';
 
 // ─── Title-based relevance filter ─────────────────────────────────────────────
 // Tested: a TITLE-ONLY check is the highest-precision signal. Articles where AB

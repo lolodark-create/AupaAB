@@ -110,7 +110,7 @@ Les browsers Playwright sont mis en cache GitHub par hash du `package-lock.json`
 - **350 caractères max** d'extrait, CHECK constraint en DB. Ne jamais bypass.
 - **CTA sortant** systématique avec `target="_blank" rel="noopener noreferrer"`.
 - **RSS uniquement.** Pas de scraping. Si un éditeur n'a pas de flux, on n'ingère pas.
-- **User-Agent identifié** : `AUPA-AB-Crawler/0.1 (+https://aupa-ab.com/sources)` — tout éditeur peut nous bloquer s'il le souhaite.
+- **User-Agent identifié** : `AUPA-AB-Crawler/0.1 (+https://aupa-ab.fr/sources)` — tout éditeur peut nous bloquer s'il le souhaite.
 - **Domain blocklist** : table dédiée, le crawler la consulte avant chaque run.
 - **Processus retrait** : formulaire `/contact-retrait` + table `takedown_requests` + email DPO automatique. Réponse < 24 h ouvrées.
 - **Mention "non-officiel"** sur l'accueil et le footer.

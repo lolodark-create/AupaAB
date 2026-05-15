@@ -24,7 +24,7 @@ async function fetchMonth(monthStart) {
   const monthEnd = new Date(monthStart);
   monthEnd.setMonth(monthEnd.getMonth() + 1);
   const url = `https://site.api.espn.com/apis/site/v2/sports/rugby/${LEAGUE_ID}/scoreboard?dates=${fmt(monthStart)}-${fmt(monthEnd)}`;
-  const r = await fetch(url, { headers: { 'User-Agent': 'AUPA-AB-Crawler/0.1 (+https://aupa-ab.com/sources)' } });
+  const r = await fetch(url, { headers: { 'User-Agent': 'AUPA-AB-Crawler/0.1 (+https://aupa-ab.fr/sources)' } });
   if (!r.ok) return [];
   const d = await r.json();
   return d.events || [];
