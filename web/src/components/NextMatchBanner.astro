@@ -1,0 +1,62 @@
+---
+// Prochain match — real data from the fixtures table populated by
+// crawler/scripts/fetch-fixtures.mjs (ESPN Top 14 endpoint, refreshed
+// daily). Renders nothing when there's no upcoming fixture (off-season,
+// crawler stale, etc.) — the home page degrades cleanly.
+import type { Fixture } from '~/lib/data';
+
+interface Props {
+  fixture: Fixture | null;
+}
+const { fixture } = Astro.props;
+
+if (!fixture) return null;
+
+// All times in DB are UTC. Render in Europe/Paris.
+const fmtDate = new Intl.DateTimeFormat('fr-FR', {
+  weekday: 'long', day: 'numeric', month: 'long',
+  timeZone: 'Europe/Paris',
+});
+const fmtTime = new Intl.DateTimeFormat('fr-FR', {
+  hour: '2-digit', minute: '2-digit',
+  timeZone: 'Europe/Paris',
+});
+const kickoff = new Date(fixture.kickoff);
+const day = fmtDate.format(kickoff);
+const time = fmtTime.format(kickoff).replace(':', 'h');
+
+const diffDays = Math.ceil((kickoff.getTime() - Date.now()) / 86_400_000);
+const countdown =
+  diffDays <= 0 ? 'AUJOURD\'HUI' :
+  diffDays === 1 ? 'DEMAIN' :
+  `J−${diffDays}`;
+
+// "AB reçoit X" vs "AB se déplace à X"
+const opponent = fixture.is_home
+  ? { name: fixture.away_name, short: fixture.away_short }
+  : { name: fixture.home_name, short: fixture.home_short };
+const venueLabel = fixture.is_home ? 'à Jean-Dauger' : `à ${fixture.venue || opponent.name}`;
+const action = fixture.is_home ? 'reçoit' : 'se déplace à';
+---
+
+<aside
+  class="rounded-lg overflow-hidden border border-aviron/30 bg-aviron/[0.04] dark:bg-aviron/[0.08]"
+  aria-label={`Prochain match : ${action} ${opponent.name}, ${day} ${time}`}
+>
+  <div class="flex items-center gap-3 md:gap-5 px-4 md:px-6 py-3 md:py-4">
+    <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-full bg-aviron text-white dark:text-night text-[10.5px] font-bold tracking-[0.1em] uppercase shrink-0">
+      {countdown}
+    </span>
+    <div class="flex items-baseline gap-2 md:gap-3 flex-wrap min-w-0">
+      <span class="font-serif font-semibold text-fg text-[15px] md:text-[17px] leading-tight">
+        AB {action} <span class="text-aviron">{opponent.name}</span>
+      </span>
+      <span class="text-[12px] md:text-[13px] text-fg-secondary capitalize tnum">
+        {day} · {time}
+      </span>
+      <span class="text-[12px] text-fg-tertiary hidden md:inline">
+        · {fixture.competition}{fixture.round_label ? ` · ${fixture.round_label}` : ''}
+      </span>
+    </div>
+  </div>
+</aside>

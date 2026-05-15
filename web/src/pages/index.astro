@@ -6,8 +6,9 @@
 // LNR or scraped from a public source.
 import SiteShell from '~/layouts/SiteShell.astro';
 import ArticleCard from '~/components/ArticleCard.astro';
+import NextMatchBanner from '~/components/NextMatchBanner.astro';
 import Button from '~/components/atoms/Button.astro';
-import { listArticles, listSourcesWithArticles, listActiveSources } from '~/lib/data';
+import { listArticles, listSourcesWithArticles, listActiveSources, getNextFixture } from '~/lib/data';
 import type { ArticleCategory } from '@shared/types';
 
 const url = Astro.url;
@@ -46,6 +47,7 @@ const sourceList = await listSourcesWithArticles();
 // shown under the H1). Distinct from listSourcesWithArticles, which is the
 // shorter set used by the filter dropdown.
 const activeSourceCount = (await listActiveSources()).length;
+const nextFixture = await getNextFixture();
 
 // Build href preserving the OTHER filters
 const buildHref = (overrides: Partial<{ cat: ArticleCategory | 'all'; src: string; since: Since }>) => {
@@ -68,8 +70,10 @@ const buildHref = (overrides: Partial<{ cat: ArticleCategory | 'all'; src: strin
   description="Toute l'actualité de l'Aviron Bayonnais, agrégée depuis les principaux médias, mise à jour toutes les 15 minutes."
 >
   <div class="max-w-container mx-auto px-4 md:px-8 pt-4 md:pt-6 pb-10 md:pb-20">
+    <NextMatchBanner fixture={nextFixture} />
+
     {/* Page intro — minimal, just enough to anchor the feed */}
-    <header class="mt-2 md:mt-4 mb-5 md:mb-7">
+    <header class="mt-5 md:mt-7 mb-5 md:mb-7">
       <span class="t-meta text-aviron">Actualités</span>
       <h1 class="mt-1 mb-2 font-serif font-semibold text-[32px] md:text-[48px] leading-[1.04] tracking-[-0.015em]" style="font-variation-settings:'opsz' 144, 'SOFT' 40; text-wrap:balance;">
         L'Aviron Bayonnais, sans en perdre une miette.

@@ -273,6 +273,40 @@ export async function listActiveSources(): Promise<
   return data ?? [];
 }
 
+// ─── Fixtures (next match + recent results) ──────────────────────────────
+export interface Fixture {
+  id: string;
+  competition: string;
+  round_label: string | null;
+  kickoff: string;           // ISO
+  home_short: string;
+  away_short: string;
+  home_name: string;
+  away_name: string;
+  venue: string | null;
+  is_home: boolean;
+  status: string;            // Scheduled | In Progress | Final | Postponed | Cancelled
+  home_score: number | null;
+  away_score: number | null;
+}
+
+// Next upcoming fixture (kickoff in the future, not cancelled). Returns null
+// when the season's over or fixtures table is empty — caller hides the
+// banner gracefully.
+export async function getNextFixture(): Promise<Fixture | null> {
+  if (!isConfigured()) return null;
+  const sb = anon();
+  const { data } = await sb
+    .from('fixtures')
+    .select('*')
+    .gte('kickoff', new Date().toISOString())
+    .not('status', 'in', '("Postponed","Cancelled")')
+    .order('kickoff', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  return (data as Fixture | null) ?? null;
+}
+
 // Sources that have at least one article visible to readers. Used by the
 // filter dropdown so we don't offer "RMC (0)" / "Rugbyrama (0)" choices
 // that lead to an empty list — La Rép, RMC, Rugbyrama are active in the

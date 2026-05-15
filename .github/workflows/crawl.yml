@@ -64,3 +64,12 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: node crawler/scripts/synthesize.mjs --limit=20
+
+      # Refresh fixtures from ESPN Top 14 API. Cheap (one HTTP roundtrip,
+      # ~10 fixtures upserted) so we run it every crawl — guarantees the
+      # next-match banner is at most 15 minutes stale, and live scores
+      # come in within that window on match day.
+      - name: Refresh fixtures
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: node crawler/scripts/fetch-fixtures.mjs
