@@ -27,7 +27,7 @@ export const GET: APIRoute = () => {
               fontFamily: 'serif',
               fontSize: '380px',
               fontWeight: 900,
-              color: '#FFFFFF',
+              color: '#0B2545', // navy on ciel = ~9:1 AAA contrast
               letterSpacing: '-18px',
               lineHeight: 0.85,
             },
@@ -41,7 +41,7 @@ export const GET: APIRoute = () => {
               fontFamily: 'serif',
               fontSize: '380px',
               fontWeight: 900,
-              color: '#FFFFFF',
+              color: '#0B2545',
               letterSpacing: '-18px',
               lineHeight: 0.85,
               marginTop: '40px',
