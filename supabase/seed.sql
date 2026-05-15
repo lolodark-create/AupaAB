@@ -11,7 +11,7 @@ insert into public.sources (slug, name, domain, feed_url, is_active, fetch_inter
   ('midol',      'Midi Olympique',             'midi-olympique.fr',          'https://www.midi-olympique.fr/rss.xml',                        true, 900),
   ('lequipe',    'L''Équipe',                  'lequipe.fr',                 'https://www.lequipe.fr/rss/actu_rss_Rugby.xml',                true, 900),
   ('rugbyrama',  'Rugbyrama',                  'rugbyrama.fr',               'https://www.rugbyrama.fr/rss.xml',                             true, 900),
-  ('aupa',       'AUPA AB',                    'aupa-ab.fr',                'https://aupa-ab.fr/rss.xml',                                  true, 900)
+  ('aupa',       'AUPA AB',                    'aupaab.fr',                'https://aupaab.fr/rss.xml',                                  true, 900)
 on conflict (slug) do nothing;
 
 -- ---------------------------------------------------------
@@ -41,7 +41,7 @@ from (values
     'avant-match-bayonne-toulouse',
     'Avant-match Bayonne — Toulouse : et si, cette fois, on osait y croire ?',
     'aupa',
-    'https://aupa-ab.fr/article/avant-match-bayonne-toulouse',
+    'https://aupaab.fr/article/avant-match-bayonne-toulouse',
     'Samedi, à Jean-Dauger, l''AB reçoit le champion de France en titre. Sept ans qu''on n''avait pas battu ces gens-là à la maison. Sept. Ans. Mais.',
     'La rédaction AUPA',
     now() - interval '3 hours',
@@ -80,7 +80,7 @@ from (values
     'derby-biarritz-pro-d2',
     'Derby : le BO en Pro D2 l''an prochain. On peut en parler ?',
     'aupa',
-    'https://aupa-ab.fr/article/derby-biarritz',
+    'https://aupaab.fr/article/derby-biarritz',
     'Le voisin va passer une dixième saison hors du Top 14. Personne, ici, n''ose vraiment se réjouir. Personne ne va pleurer non plus.',
     'AUPA AB',
     now() - interval '2 days',

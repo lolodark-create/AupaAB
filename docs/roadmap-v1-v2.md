@@ -44,7 +44,7 @@ Principe : **livrer V1 vite, valider l'audience, puis empiler.**
 - Push vers `articles` + Postgres FTS index auto via trigger
 - Génération vignette Cloudinary
 - Log dans `crawl_runs`
-- **Respect strict** : `robots.txt` (même via RSS), User-Agent identifié `AUPA-AB-Crawler/1.0 (+https://aupa-ab.fr/about)`, rate limit 1 req/2s par source
+- **Respect strict** : `robots.txt` (même via RSS), User-Agent identifié `AUPA-AB-Crawler/1.0 (+https://aupaab.fr/about)`, rate limit 1 req/2s par source
 
 ### Sécurité V1
 - HTTPS + HSTS + CSP strict (script-src 'self' + Cloudinary + Plausible)

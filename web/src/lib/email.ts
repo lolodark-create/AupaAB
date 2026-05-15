@@ -8,8 +8,8 @@
 // build doesn't pull a heavy email framework (react-email is overkill
 // for three templates). Inline CSS only — Outlook/Gmail strip <style>.
 const RESEND_API_KEY = import.meta.env.RESEND_API_KEY;
-const FROM = import.meta.env.NEWSLETTER_FROM || 'AUPA AB <newsletter@aupa-ab.fr>';
-const REPLY_TO = import.meta.env.NEWSLETTER_REPLY_TO || 'contact@aupa-ab.fr';
+const FROM = import.meta.env.NEWSLETTER_FROM || 'AUPA AB <newsletter@aupaab.fr>';
+const REPLY_TO = import.meta.env.NEWSLETTER_REPLY_TO || 'contact@aupaab.fr';
 const SITE_URL = import.meta.env.PUBLIC_SITE_URL || 'https://aupa-ab.vercel.app';
 
 export function emailConfigured(): boolean {
@@ -141,7 +141,7 @@ export async function sendDailyDigest(
     <p style="font-size:13px;color:#5F6975;margin:0 0 24px;">${stat}</p>
     ${cards}
     <p style="margin:24px 0 0;font-size:13px;color:#5F6975;line-height:1.55;">
-      Bonne journée. <a href="${SITE_URL}" style="color:#006B9D;">Voir tout sur aupa-ab.fr</a>
+      Bonne journée. <a href="${SITE_URL}" style="color:#006B9D;">Voir tout sur aupaab.fr</a>
     </p>
     <p style="margin:32px 0 0;font-size:11px;color:#878E9A;line-height:1.5;text-align:center;">
       Tu veux arrêter de recevoir cette brève ? <a href="${unsubLink}" style="color:#878E9A;">Se désinscrire en 1 clic</a>.

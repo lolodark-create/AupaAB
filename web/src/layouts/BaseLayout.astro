@@ -31,7 +31,7 @@ const {
   noindex = false,
 } = Astro.props;
 
-const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://aupa-ab.fr';
+const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://aupaab.fr';
 const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).toString();
 const fullTitle = title === 'AUPA AB' ? title : `${title} — AUPA AB`;
 // OG image — defaults to the brand SVG; article pages can pass a per-slug URL

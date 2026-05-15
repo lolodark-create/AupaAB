@@ -19,8 +19,8 @@ import postgres from 'postgres';
 const DATABASE_URL = process.env.DATABASE_URL;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const SITE_URL = process.env.PUBLIC_SITE_URL || 'https://aupa-ab.vercel.app';
-const FROM = process.env.NEWSLETTER_FROM || 'AUPA AB <newsletter@aupa-ab.fr>';
-const REPLY_TO = process.env.NEWSLETTER_REPLY_TO || 'contact@aupa-ab.fr';
+const FROM = process.env.NEWSLETTER_FROM || 'AUPA AB <newsletter@aupaab.fr>';
+const REPLY_TO = process.env.NEWSLETTER_REPLY_TO || 'contact@aupaab.fr';
 
 if (!DATABASE_URL) { console.error('DATABASE_URL required'); process.exit(1); }
 
@@ -123,7 +123,7 @@ function buildHtml(unsubToken) {
     <h1 style="font-family:'New York','Iowan Old Style',Charter,Georgia,serif;font-size:26px;line-height:1.15;margin:0 0 6px;font-weight:600;letter-spacing:-0.01em;">La brève du matin</h1>
     <p style="font-size:13px;color:#5F6975;margin:0 0 8px;">${stat}</p>
     ${sections}
-    <p style="margin:32px 0 0;font-size:13px;color:#5F6975;line-height:1.55;">Bonne journée. <a href="${SITE_URL}" style="color:#006B9D;">Voir tout sur aupa-ab.fr</a></p>
+    <p style="margin:32px 0 0;font-size:13px;color:#5F6975;line-height:1.55;">Bonne journée. <a href="${SITE_URL}" style="color:#006B9D;">Voir tout sur aupaab.fr</a></p>
     <p style="margin:24px 0 0;font-size:11px;color:#878E9A;line-height:1.5;text-align:center;">
       Tu veux arrêter ? <a href="${unsubLink}" style="color:#878E9A;">Se désinscrire en 1 clic</a>.
     </p>`);

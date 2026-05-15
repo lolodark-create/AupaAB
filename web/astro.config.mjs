@@ -4,7 +4,7 @@ import node from '@astrojs/node';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
-const SITE_URL = process.env.PUBLIC_SITE_URL || 'https://aupa-ab.fr';
+const SITE_URL = process.env.PUBLIC_SITE_URL || 'https://aupaab.fr';
 
 // Pick the adapter via env: ADAPTER=vercel (default) or ADAPTER=node.
 // Vercel for production hosting, node for self-hosting (Railway/Fly/VPS) and local SSR tests.

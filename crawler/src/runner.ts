@@ -17,7 +17,7 @@ import { classifyArticle } from './classify.js';
 import { generateExcerpt } from './excerpt.js';
 import { generateSlug } from './slug.js';
 
-const USER_AGENT = 'AUPA-AB-Crawler/0.1 (+https://aupa-ab.fr/sources)';
+const USER_AGENT = 'AUPA-AB-Crawler/0.1 (+https://aupaab.fr/sources)';
 const SOURCE_DELAY_MS = 2_000;
 const PER_RUN_TIMEOUT_MS = 30_000;
 

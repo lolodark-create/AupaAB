@@ -22,7 +22,7 @@ test('1. Visitor reads an article and follows the source link', async ({ page })
   await expect(outbound).toHaveAttribute('target', '_blank');
   await expect(outbound).toHaveAttribute('rel', /noopener/);
 
-  // Verify legal mention "non-officiel" is in the source URL host (not aupa-ab.fr)
+  // Verify legal mention "non-officiel" is in the source URL host (not aupaab.fr)
   const outboundHref = await outbound.getAttribute('href');
   expect(outboundHref).toMatch(/^https?:\/\//);
 });
@@ -138,7 +138,7 @@ test('API: takedown form accepts a valid submission', async ({ request }) => {
     data: {
       email: 'editor@example.com',
       organization: 'Example Media',
-      url: 'https://aupa-ab.fr/article/test',
+      url: 'https://aupaab.fr/article/test',
       reason: 'copyright',
       message: 'Test takedown request.',
     },
