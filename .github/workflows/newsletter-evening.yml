@@ -1,0 +1,47 @@
+name: Post-match newsletter
+
+# Top 14 schedule covers kickoffs Fri 21h, Sat 14h35 / 16h35 / 17h / 21h05,
+# Sun 16h05. The script checks the fixtures table on each run and exits
+# silently (no email) when no AB fixture finished today, so spamming the
+# cron is safe.
+#
+# UTC cron times (Paris in parens, CEST):
+#   - Fri 21:30 UTC = 23:30 Paris       (covers Fri evening kickoff)
+#   - Sat 19:30 UTC = 21:30 Paris       (covers Sat afternoon kickoffs)
+#   - Sat 22:30 UTC = 00:30 Sun Paris   (covers Sat 21h kickoff)
+#   - Sun 19:00 UTC = 21:00 Paris       (covers Sun afternoon kickoff)
+
+on:
+  schedule:
+    - cron: '30 21 * * 5'
+    - cron: '30 19 * * 6'
+    - cron: '30 22 * * 6'
+    - cron: '0  19 * * 0'
+  workflow_dispatch: {}
+
+concurrency:
+  group: newsletter-evening
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: crawler/package-lock.json
+      - run: npm ci --prefix crawler
+      - name: Send post-match digest
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL || 'https://aupaab.fr' }}
+          NEWSLETTER_FROM: ${{ vars.NEWSLETTER_FROM }}
+          NEWSLETTER_REPLY_TO: ${{ vars.NEWSLETTER_REPLY_TO }}
+        run: node crawler/scripts/send-newsletter.mjs --kind=evening

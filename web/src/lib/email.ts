@@ -45,9 +45,10 @@ async function send(to: string, subject: string, html: string, text: string): Pr
 }
 
 // ─── Templates ───────────────────────────────────────────────────────────
-function shell(title: string, body: string) {
-  // Bare-bones email shell. No web fonts (clients block them), system stack.
-  // Single column, max-width 560px, Apple-ish.
+// Full-bleed sky-blue brand band header + centred wordmark + kicker.
+// Mirrored in crawler/scripts/send-newsletter.mjs::shell — edit BOTH
+// when tweaking the visual.
+function shell(title: string, body: string, kicker = 'La brève du matin') {
   return `<!doctype html>
 <html lang="fr">
 <head>
@@ -56,26 +57,30 @@ function shell(title: string, body: string) {
   <title>${title}</title>
 </head>
 <body style="margin:0;padding:0;background:#FAFAF7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;color:#1A1D24;-webkit-font-smoothing:antialiased;">
-  <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" width="100%" style="max-width:560px;margin:0 auto;padding:24px 20px;">
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" width="100%" style="max-width:600px;margin:0 auto;background:#FFFFFF;border:1px solid #E5E2D9;border-radius:14px;overflow:hidden;">
     <tr>
-      <td style="padding-bottom:24px;">
-        <a href="${SITE_URL}" style="display:inline-block;text-decoration:none;">
-          <span style="display:inline-block;width:36px;height:36px;background:#B3DCFA;border-radius:6px;vertical-align:middle;text-align:center;line-height:36px;color:#FAFAF7;font-weight:900;font-size:9px;letter-spacing:-0.5px;">
-            <span style="display:block;line-height:1;padding-top:7px;">AUPA</span>
-            <span style="display:block;line-height:1;padding-top:1px;">AB</span>
-          </span>
-          <span style="display:inline-block;vertical-align:middle;font-family:'New York','Iowan Old Style',Charter,Georgia,serif;font-size:18px;font-weight:600;color:#1A1D24;margin-left:8px;">
-            AUPA <span style="color:#006B9D;">AB</span>
-          </span>
+      <td align="center" style="background:#B3DCFA;padding:28px 20px 22px;text-align:center;">
+        <a href="${SITE_URL}" style="text-decoration:none;display:inline-block;">
+          <div style="font-family:'New York','Iowan Old Style',Charter,Georgia,serif;font-size:34px;font-weight:700;color:#FFFFFF;letter-spacing:-0.02em;line-height:1;">
+            AUPA <span style="opacity:0.85;">AB</span>
+          </div>
+          <div style="margin-top:8px;font-size:11px;font-weight:600;color:#FFFFFF;opacity:0.92;letter-spacing:0.18em;text-transform:uppercase;">
+            ${kicker}
+          </div>
         </a>
       </td>
     </tr>
-    <tr><td>${body}</td></tr>
+    <tr><td style="padding:28px 28px 8px 28px;">${body}</td></tr>
     <tr>
-      <td style="padding-top:32px;border-top:1px solid #E5E2D9;color:#5F6975;font-size:11px;line-height:1.5;">
-        AUPA AB est un agrégateur d'actualités <em>officiellement non-officiel</em> de l'Aviron Bayonnais.<br>
-        Faits par des supporters, pour des supporters. Pas de pisteur, pas de pub.<br>
-        <a href="${SITE_URL}/mentions-legales" style="color:#006B9D;">Mentions légales</a> · <a href="${SITE_URL}/confidentialite" style="color:#006B9D;">Confidentialité</a>
+      <td style="padding:8px 28px 28px 28px;border-top:1px solid #F3F1EB;color:#5F6975;font-size:11px;line-height:1.55;margin-top:16px;">
+        <p style="margin:16px 0 4px;">AUPA AB est un agrégateur d'actualités <em>officiellement non-officiel</em> de l'Aviron Bayonnais. Fait par des supporters, pour des supporters.</p>
+        <p style="margin:4px 0;">
+          <a href="${SITE_URL}" style="color:#006B9D;text-decoration:none;">aupaab.fr</a>
+          &nbsp;·&nbsp;
+          <a href="${SITE_URL}/mentions-legales" style="color:#5F6975;text-decoration:none;">Mentions légales</a>
+          &nbsp;·&nbsp;
+          <a href="${SITE_URL}/confidentialite" style="color:#5F6975;text-decoration:none;">Confidentialité</a>
+        </p>
       </td>
     </tr>
   </table>
@@ -85,21 +90,20 @@ function shell(title: string, body: string) {
 
 export async function sendConfirm(to: string, confirmationToken: string) {
   const link = `${SITE_URL}/api/newsletter/confirm?token=${confirmationToken}`;
-  const html = shell(
-    'Confirme ton inscription',
-    `<h1 style="font-family:'New York','Iowan Old Style',Charter,Georgia,serif;font-size:28px;line-height:1.15;margin:0 0 16px;font-weight:600;letter-spacing:-0.01em;color:#1A1D24;">
+  const body = `
+    <h1 style="font-family:'New York','Iowan Old Style',Charter,Georgia,serif;font-size:28px;line-height:1.15;margin:0 0 16px;font-weight:600;letter-spacing:-0.01em;color:#1A1D24;">
       Encore un clic et c'est bon.
     </h1>
     <p style="font-size:16px;line-height:1.6;color:#1A1D24;margin:0 0 20px;">
-      Confirme ton inscription à la brève AUPA AB en cliquant ci-dessous. Tu recevras chaque matin à 8h les 3 articles à connaître sur l'Aviron Bayonnais, en deux phrases pour chacun.
+      Confirme ton inscription à la brève AUPA AB. Tu recevras chaque matin à 8&nbsp;h tous les articles AB des dernières 24&nbsp;h, synthétisés en deux phrases chacun.
     </p>
     <p style="margin:24px 0;">
       <a href="${link}" style="display:inline-block;background:#006B9D;color:#FFFFFF;text-decoration:none;font-weight:600;font-size:15px;padding:14px 24px;border-radius:8px;">Je confirme mon adresse</a>
     </p>
     <p style="font-size:13px;line-height:1.55;color:#5F6975;margin:24px 0 0;">
       Si tu n'as rien demandé, ignore cet e-mail — sans confirmation, on ne t'écrira jamais.
-    </p>`,
-  );
+    </p>`;
+  const html = shell('Confirme ton inscription', body, 'Confirmation d\'inscription');
   const text = `Confirme ton inscription à AUPA AB en ouvrant ce lien :\n${link}\n\nSi tu n'as rien demandé, ignore ce message.`;
   return send(to, 'Confirme ton inscription à AUPA AB', html, text);
 }

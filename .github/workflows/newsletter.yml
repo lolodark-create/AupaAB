@@ -34,4 +34,4 @@ jobs:
           PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL || 'https://aupa-ab.vercel.app' }}
           NEWSLETTER_FROM: ${{ vars.NEWSLETTER_FROM }}
           NEWSLETTER_REPLY_TO: ${{ vars.NEWSLETTER_REPLY_TO }}
-        run: node crawler/scripts/send-newsletter.mjs
+        run: node crawler/scripts/send-newsletter.mjs --kind=morning
