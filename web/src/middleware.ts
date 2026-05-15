@@ -11,7 +11,7 @@ const CSP_BASE = [
   // We hot-link article thumbnails from the source CDN of each registered
   // press partner. Listing each domain explicitly (instead of `https:`) keeps
   // the CSP narrow — the browser still blocks any random https image.
-  "img-src 'self' data: https://res.cloudinary.com https://media.sudouest.fr https://images.rugbyrama.fr https://www.midi-olympique.fr https://images.midi-olympique.fr https://media.rmcsport.fr https://www.rmcsport.fr https://www.francebleu.fr https://media.francebleu.fr https://www.ici.fr https://media.ici.fr https://media.larepubliquedespyrenees.fr",
+  "img-src 'self' data: https://res.cloudinary.com https://media.sudouest.fr https://images.rugbyrama.fr https://www.midi-olympique.fr https://images.midi-olympique.fr https://media.rmcsport.fr https://www.rmcsport.fr https://www.francebleu.fr https://media.francebleu.fr https://www.ici.fr https://media.ici.fr https://media.larepubliquedespyrenees.fr https://www.quinzemondial.com https://i0.wp.com https://i1.wp.com https://i2.wp.com https://i3.wp.com https://www.lerugbynistere.fr https://medias.lerugbynistere.fr https://www.lefigaro.fr https://i.f1g.fr https://media.lefigaro.fr",
   "connect-src 'self' https://*.supabase.co https://plausible.io",
   "frame-ancestors 'none'",
   "base-uri 'self'",

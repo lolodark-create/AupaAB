@@ -19,6 +19,10 @@ export const SOURCE_META: Record<string, SourceMeta> = {
   rugbyrama: { mono: 'RR', color: '#01608F' },   // darkened from #0288D1 (3.4:1 → 6.4:1)
   aupa: { mono: 'AB', color: '#006B9D' },        // darkened from #0099D8 to match brand aviron-text (5.5:1)
   'ici-pb': { mono: 'ICI', color: '#7A0019' },   // ICI brand burgundy, 11.9:1 ✓
+  // Added V1.1 after the Google Actu audit — three complementary rugby sources.
+  'quinze-mondial': { mono: 'QM', color: '#1E3A8A' }, // navy, 9.9:1 ✓
+  'rugbynistere':   { mono: 'RN', color: '#0F766E' }, // teal, 5.1:1 ✓
+  'figaro-rugby':   { mono: 'FG', color: '#1F2937' }, // Le Figaro dark, 13.7:1 ✓
 };
 
 export function getSourceMeta(slug: string): SourceMeta {

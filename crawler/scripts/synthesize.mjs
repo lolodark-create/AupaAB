@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
- * Synthesize article excerpts in the AUPA AB editorial tone.
+ * Synthesize article TITLE + EXCERPT in the AUPA AB editorial tone.
  *
- * Each new article gets a 2-sentence supporter-perspective synthesis that
- * replaces the raw RSS excerpt on the card. Picks up articles where
- * ai_synthesis IS NULL and calls Claude Haiku.
+ * One Claude call per article produces both:
+ *   - ai_title       (3-7 words, headline-editor punch line)
+ *   - ai_synthesis   (2 sentences, ~150 chars, supporter perspective)
  *
- * Why Claude Haiku: cheap (<$0.001/article), fast (<1s), and quality is
- * fine for 200-character editorial blurbs. Falls back gracefully if the
- * API key is missing — the UI uses the raw excerpt in that case.
+ * Why one call: cheaper (no double system-prompt charge), more coherent
+ * (the model sees both targets at once), and atomically written so a card
+ * never shows the new title with the old synthesis or vice versa.
  *
  * Usage:
  *   DATABASE_URL=...  ANTHROPIC_API_KEY=sk-ant-...  node crawler/scripts/synthesize.mjs
@@ -27,7 +27,7 @@ if (!DATABASE_URL) {
   process.exit(1);
 }
 if (!ANTHROPIC_API_KEY) {
-  console.log('⚠ ANTHROPIC_API_KEY not set — skipping synthesis (UI will fall back to raw excerpts)');
+  console.log('⚠ ANTHROPIC_API_KEY not set — skipping synthesis (UI will fall back to raw title/excerpt)');
   process.exit(0);
 }
 
@@ -37,51 +37,69 @@ const FORCE = args.includes('--force');
 const DRY = args.includes('--dry-run');
 
 // ─── Prompt ───────────────────────────────────────────────────────────────
-// The tone is the central design decision: a Tribune-Sud supporter
-// summarizing the article to a mate, not a journalist's lede. Examples
-// help the model stay on register; without them it defaults to clickbait.
 const SYSTEM_PROMPT = `Tu es l'éditeur d'AUPA AB, un agrégateur d'actualités non-officiel sur l'Aviron Bayonnais (Top 14). Le ton du site est celui d'un supporter qui parle à ses copains en Tribune Sud du stade Jean-Dauger : direct, concret, légèrement ironique mais toujours bienveillant envers le club.
 
-À partir du titre et de l'extrait de l'article, rédige une synthèse de 1 à 2 phrases (140-200 caractères au total) qui donne l'essentiel sans clickbait.
+À partir du titre et de l'extrait de l'article source, tu produis DEUX choses :
 
-Règles strictes :
-- Première personne du pluriel ("on", "nous") plutôt que "le club" ou "les Bayonnais"
-- Cite les noms propres pertinents (joueurs, scores, adversaires, dates)
-- Aucun superlatif vide : pas de "incroyable", "exceptionnel", "fabuleux"
+1. TITRE — un titre court, le nectar de l'information en 3 à 7 mots. Le titre journalistique original est souvent long et clickbait ; toi tu donnes l'info centrale d'un coup, comme une manchette de journal. Cite des faits concrets (joueur, score, date, adversaire) plutôt que des formules vagues.
+
+2. SYNTHESE — 1 à 2 phrases (140-200 caractères) qui développent. Première personne du pluriel ("on", "nous"). Cite les noms propres pertinents.
+
+Règles strictes pour les deux :
+- Aucun superlatif vide (incroyable, exceptionnel, fabuleux)
 - Aucune question rhétorique
 - Aucun emoji, aucun anglicisme
 - Français, ponctuation correcte
-- Termine par un point. Jamais par "..."
-- Réponds UNIQUEMENT avec la synthèse. Aucun préambule, aucun guillemet, aucune balise.
+- Termine par un point, jamais par "..."
+- Pas de guillemets autour de la sortie
 
-Exemples du ton recherché :
+Format de réponse STRICT — exactement cette structure, rien d'autre :
+TITRE: <ton titre court>
+SYNTHESE: <ta synthèse>
 
-Titre: « Tous mes soucis sont derrière moi » : Baptiste Heguy va rejouer
-Extrait: Trois mois et demi après avoir été séché par un syndrome opsoclonus-myoclonus...
-Synthèse: Le retour qu'on espérait : Heguy revient à 100% après trois mois loin du terrain. Direction Lyon ce week-end pour rejouer un bout de saison.
+Exemples du registre attendu :
 
-Titre: Top 14 - Bayonne : Andrea Moretti de passage, Tevita Tatafu disponible
-Extrait: La composition pour le déplacement à Lyon est presque connue...
-Synthèse: Tatafu enfin opérationnel pour le voyage à Lyon, Moretti seulement de passage. Le pack devrait avoir une vraie gueule samedi soir.
+ARTICLE: « Tous mes soucis sont derrière moi » : Baptiste Heguy va rejouer
+EXTRAIT: Trois mois et demi après avoir été séché par un syndrome opsoclonus-myoclonus...
+TITRE: Heguy revient après trois mois
+SYNTHESE: Le retour qu'on espérait : Heguy revient à 100% après cette saleté de virus rare. Direction Lyon ce week-end pour rejouer.
 
-Titre: ANALYSE. « Notre concentration n'est pas au niveau » : l'Aviron Bayonnais encore loin du compte à Toulon
-Extrait: Largement battus 52-26 sur la Rade...
-Synthèse: 52-26 à Toulon, dixième défaite de l'année. On ne sait plus si c'est la concentration ou autre chose, mais le compteur tourne dans le mauvais sens.`;
+ARTICLE: Top 14 - Bayonne : Andrea Moretti de passage, Tevita Tatafu disponible pour défier Lyon
+EXTRAIT: La composition pour le déplacement à Lyon est presque connue...
+TITRE: Tatafu opérationnel pour Lyon
+SYNTHESE: Tatafu enfin opérationnel pour le voyage à Lyon, Moretti seulement de passage. Le pack devrait avoir une vraie gueule samedi soir.
+
+ARTICLE: ANALYSE. « Notre concentration n'est pas au niveau » : l'Aviron Bayonnais encore loin du compte à Toulon
+EXTRAIT: Largement battus 52-26 sur la Rade...
+TITRE: AB sombre à Toulon (52-26)
+SYNTHESE: 52-26 à Toulon, dixième défaite de l'année. On ne sait plus si c'est la concentration ou autre chose, mais le compteur tourne dans le mauvais sens.
+
+ARTICLE: Aviron Bayonnais : Esteban Capilla sur le départ dès cet été ?
+EXTRAIT: Les discussions traînent pour prolonger Capilla au-delà de 2027...
+TITRE: Capilla vers la sortie cet été
+SYNTHESE: Les discussions traînent pour prolonger Capilla au-delà de 2027. Le président Tayeb négocie mais rien n'est encore signé et un départ cet été n'est pas exclu.`;
 
 function userPrompt(article) {
-  return `Titre: ${article.title}
-Source: ${article.source_name}
-Date: ${new Date(article.published_at).toISOString().slice(0, 10)}
-Extrait: ${article.excerpt || '(pas d\'extrait disponible)'}
+  return `ARTICLE: ${article.title}
+SOURCE: ${article.source_name}
+DATE: ${new Date(article.published_at).toISOString().slice(0, 10)}
+EXTRAIT: ${article.excerpt || '(pas d\'extrait disponible)'}
 
-Synthèse :`;
+Réponds maintenant au format demandé :`;
 }
 
-// ─── Anthropic API call ───────────────────────────────────────────────────
+function parseResponse(text) {
+  const tMatch = text.match(/TITRE\s*:\s*(.+?)(?=\n|$)/i);
+  const sMatch = text.match(/SYNTHESE\s*:\s*([\s\S]+?)(?:\n\n|$)/i);
+  const title = tMatch?.[1]?.trim().replace(/^["«"„'']+|["»"'']+\.?$/g, '').replace(/\.$/, '').trim();
+  const synthesis = sMatch?.[1]?.trim().replace(/^["«"„'']+|["»"'']+$/g, '').trim();
+  return { title, synthesis };
+}
+
 async function synthesize(article) {
   const body = {
     model: MODEL,
-    max_tokens: 200,
+    max_tokens: 350,
     temperature: 0.7,
     system: SYSTEM_PROMPT,
     messages: [{ role: 'user', content: userPrompt(article) }],
@@ -101,14 +119,15 @@ async function synthesize(article) {
   }
   const data = await res.json();
   const text = (data.content?.[0]?.text || '').trim();
-  // Strip any wrapping quotes the model occasionally adds.
-  return text.replace(/^["«"„'']+|["»"'']+$/g, '').trim();
+  return parseResponse(text);
 }
 
 // ─── Run ──────────────────────────────────────────────────────────────────
 const sql = postgres(DATABASE_URL, { ssl: 'require', max: 1, prepare: false });
 
-const where = FORCE ? sql`` : sql`where a.ai_synthesis is null`;
+// Pick articles missing EITHER field, so the script repopulates ai_title for
+// pre-V1.1 articles that already have ai_synthesis.
+const where = FORCE ? sql`` : sql`where a.ai_title is null or a.ai_synthesis is null`;
 const articles = await sql`
   select a.id, a.title, a.excerpt, a.published_at, s.name as source_name
   from public.articles a
@@ -123,23 +142,25 @@ console.log(`▶ ${articles.length} article(s) to synthesize${DRY ? ' (DRY RUN)'
 let ok = 0;
 let fail = 0;
 for (const a of articles) {
-  process.stdout.write(`  ${a.title.slice(0, 60).padEnd(60)} ... `);
+  process.stdout.write(`  ${a.title.slice(0, 60).padEnd(60)} `);
   try {
-    const synthesis = await synthesize(a);
-    if (!synthesis) throw new Error('empty response');
+    const { title, synthesis } = await synthesize(a);
+    if (!title || !synthesis) throw new Error('parse failed');
     if (DRY) {
-      console.log('\n     →', synthesis);
+      console.log(`(dry)`);
+      console.log(`     T: ${title}`);
+      console.log(`     S: ${synthesis}`);
     } else {
-      await sql`update public.articles set ai_synthesis = ${synthesis} where id = ${a.id}`;
-      console.log(`✓ (${synthesis.length} chars)`);
-      console.log(`     → ${synthesis}`);
+      await sql`update public.articles set ai_title = ${title}, ai_synthesis = ${synthesis} where id = ${a.id}`;
+      console.log(`✓`);
+      console.log(`     T: ${title}`);
+      console.log(`     S: ${synthesis}`);
     }
     ok++;
   } catch (err) {
     console.log(`✗ ${err.message}`);
     fail++;
   }
-  // Rate-limit politely
   await new Promise((r) => setTimeout(r, 500));
 }
 

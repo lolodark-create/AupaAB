@@ -162,7 +162,7 @@ const buildHref = (overrides: Partial<{ cat: ArticleCategory | 'all'; src: strin
           <ArticleCard
             variant="row"
             slug={a.slug}
-            title={a.title}
+            title={a.ai_title ?? a.title}
             lede={a.lede ?? a.excerpt}
             category={a.category}
             sourceSlug={a.source.slug}

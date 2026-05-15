@@ -12,7 +12,10 @@ import type { ArticleCategory } from '@shared/types';
 export interface ArticleListItem {
   id: string;
   slug: string;
+  /** Original journalist headline (kept for SEO + detail-page fallback) */
   title: string;
+  /** AI-rewritten short headline (3-7 words) in the AUPA tone */
+  ai_title: string | null;
   excerpt: string;
   ai_synthesis: string | null;
   author: string | null;
@@ -53,6 +56,7 @@ interface DbRow {
   id: string;
   slug: string;
   title: string;
+  ai_title?: string | null;
   excerpt: string;
   ai_synthesis?: string | null;
   author: string | null;
@@ -72,6 +76,7 @@ function toItem(r: DbRow): ArticleListItem {
     id: r.id,
     slug: r.slug,
     title: r.title,
+    ai_title: r.ai_title ?? null,
     excerpt: r.excerpt,
     ai_synthesis: r.ai_synthesis ?? null,
     author: r.author,
@@ -97,6 +102,7 @@ function fromMock(a: (typeof MOCK_ARTICLES)[number]): ArticleListItem {
     id: a.id,
     slug: a.slug,
     title: a.title,
+    ai_title: null,
     excerpt: a.excerpt,
     ai_synthesis: null,
     author: a.author,
@@ -150,7 +156,7 @@ export async function listArticles(params: {
   let q = sb
     .from('articles_public')
     .select(
-      'id, slug, title, excerpt, ai_synthesis, author, published_at, category, comment_count, reading_time_sec, cover_image_url, cover_variant, source_url, tags, sources(slug, name, domain)',
+      'id, slug, title, ai_title, excerpt, ai_synthesis, author, published_at, category, comment_count, reading_time_sec, cover_image_url, cover_variant, source_url, tags, sources(slug, name, domain)',
     )
     .order('published_at', { ascending: false })
     .limit(limit);
@@ -183,7 +189,7 @@ export async function getArticle(slug: string): Promise<ArticleListItem | null> 
   const { data, error } = await sb
     .from('articles_public')
     .select(
-      'id, slug, title, excerpt, ai_synthesis, author, published_at, category, comment_count, reading_time_sec, cover_image_url, cover_variant, source_url, tags, sources(slug, name, domain)',
+      'id, slug, title, ai_title, excerpt, ai_synthesis, author, published_at, category, comment_count, reading_time_sec, cover_image_url, cover_variant, source_url, tags, sources(slug, name, domain)',
     )
     .eq('slug', slug)
     .maybeSingle();
@@ -223,6 +229,9 @@ export async function searchArticles(q: string, cat?: ArticleCategory, src?: str
     id: r.id as string,
     slug: r.slug as string,
     title: r.title as string,
+    // search_articles RPC doesn't return ai_title yet — falls back to title
+    // on cards. To surface AUPA titles in search, extend the RPC signature.
+    ai_title: null,
     excerpt: r.excerpt as string,
     author: r.author as string | null,
     published_at: r.published_at as string,
