@@ -67,9 +67,15 @@ for (const ev of events) {
   const homeScore = home.score != null && home.score !== '' ? parseInt(home.score, 10) : null;
   const awayScore = away.score != null && away.score !== '' ? parseInt(away.score, 10) : null;
 
+  const competition = 'French Top 14';
+  // ESPN's broadcasts field is empty for France — we hardcode by competition.
+  // Top 14 has been Canal+ exclusive since the 2023-27 TV deal.
+  const broadcast = competition === 'French Top 14' ? 'Canal+ Sport' : null;
+
   const row = {
     id: String(ev.id),
-    competition: 'French Top 14',
+    competition,
+    broadcast,
     round_label: ev.week?.text || comp.notes?.[0]?.headline || null,
     kickoff: new Date(ev.date),
     home_id: String(home.team?.id || home.id),
@@ -87,11 +93,11 @@ for (const ev of events) {
 
   await sql`
     insert into public.fixtures (
-      id, competition, round_label, kickoff,
+      id, competition, broadcast, round_label, kickoff,
       home_id, away_id, home_short, away_short, home_name, away_name,
       venue, is_home, status, home_score, away_score, fetched_at
     ) values (
-      ${row.id}, ${row.competition}, ${row.round_label}, ${row.kickoff},
+      ${row.id}, ${row.competition}, ${row.broadcast}, ${row.round_label}, ${row.kickoff},
       ${row.home_id}, ${row.away_id}, ${row.home_short}, ${row.away_short}, ${row.home_name}, ${row.away_name},
       ${row.venue}, ${row.is_home}, ${row.status}, ${row.home_score}, ${row.away_score}, now()
     )
@@ -102,6 +108,7 @@ for (const ev of events) {
       away_score = excluded.away_score,
       venue = excluded.venue,
       round_label = excluded.round_label,
+      broadcast = excluded.broadcast,
       fetched_at = now()
   `;
   upserted++;

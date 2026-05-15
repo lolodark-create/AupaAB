@@ -85,11 +85,40 @@ EXTRAIT: Les discussions traînent pour prolonger Capilla au-delà de 2027...
 TITRE: Capilla vers la sortie cet été
 SYNTHESE: Les discussions traînent pour prolonger Capilla au-delà de 2027. Le président Tayeb négocie mais rien n'est encore signé et un départ cet été n'est pas exclu.`;
 
-function userPrompt(article) {
+// Format the matched fixture (if any) as a "verified facts" block so the
+// model can include the kickoff/venue/broadcast without inventing them —
+// the anti-hallucination rule in the system prompt forbids guessing TV
+// channels, so without this block the synthesis stays vague.
+function fixtureBlock(fixture) {
+  if (!fixture) return '';
+  const kickoff = new Date(fixture.kickoff);
+  const day = new Intl.DateTimeFormat('fr-FR', {
+    weekday: 'long', day: 'numeric', month: 'long',
+    timeZone: 'Europe/Paris',
+  }).format(kickoff);
+  const time = new Intl.DateTimeFormat('fr-FR', {
+    hour: '2-digit', minute: '2-digit',
+    timeZone: 'Europe/Paris',
+  }).format(kickoff).replace(':', 'h');
+  const opponent = fixture.is_home ? fixture.away_name : fixture.home_name;
+  const venue = fixture.venue || (fixture.is_home ? 'Stade Jean-Dauger' : '');
+  const direction = fixture.is_home ? `On reçoit ${opponent}` : `On se déplace à ${opponent}`;
+  const lines = [
+    `Adversaire : ${opponent}`,
+    `Lieu       : ${venue}`,
+    `Coup d'envoi : ${day} ${time} (heure de Paris)`,
+    fixture.broadcast ? `Diffusion  : ${fixture.broadcast}` : null,
+    `Compétition : ${fixture.competition}${fixture.round_label ? ` — ${fixture.round_label}` : ''}`,
+    `Phrase de cadrage : ${direction}`,
+  ].filter(Boolean).join('\n');
+  return `\n\nFAITS VÉRIFIÉS DU MATCH À VENIR (utilise-les tels quels, ils sont en base) :\n${lines}\n`;
+}
+
+function userPrompt(article, fixture) {
   return `ARTICLE: ${article.title}
 SOURCE: ${article.source_name}
 DATE: ${new Date(article.published_at).toISOString().slice(0, 10)}
-EXTRAIT: ${article.excerpt || '(pas d\'extrait disponible)'}
+EXTRAIT: ${article.excerpt || '(pas d\'extrait disponible)'}${fixtureBlock(fixture)}
 
 Réponds maintenant au format demandé :`;
 }
@@ -102,13 +131,13 @@ function parseResponse(text) {
   return { title, synthesis };
 }
 
-async function synthesize(article) {
+async function synthesize(article, fixture) {
   const body = {
     model: MODEL,
     max_tokens: 350,
     temperature: 0.7,
     system: SYSTEM_PROMPT,
-    messages: [{ role: 'user', content: userPrompt(article) }],
+    messages: [{ role: 'user', content: userPrompt(article, fixture) }],
   };
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -131,6 +160,43 @@ async function synthesize(article) {
 // ─── Run ──────────────────────────────────────────────────────────────────
 const sql = postgres(DATABASE_URL, { ssl: 'require', max: 1, prepare: false });
 
+// All fixtures within a wide window — small enough to keep in memory, big
+// enough to cover preview / recap / mid-week articles. The matcher below
+// uses opponent-name substring + same-week heuristic to bind an article
+// to its fixture.
+const allFixtures = await sql`
+  select id, kickoff, competition, broadcast, round_label, venue, is_home,
+         home_short, home_name, away_short, away_name
+  from public.fixtures
+  where kickoff between now() - interval '14 days' and now() + interval '60 days'
+  order by kickoff
+`;
+
+// Match an article to its fixture by:
+//   1. opponent name appears in the title (full or abbreviation)
+//   2. fixture kickoff is within ±7 days of article published_at
+// Returns the closest fixture by date if multiple match.
+function matchFixture(article) {
+  const t = (article.title || '').toLowerCase();
+  const pubMs = new Date(article.published_at).getTime();
+  let best = null;
+  let bestDelta = Infinity;
+  for (const f of allFixtures) {
+    const opp = f.is_home ? f.away_name : f.home_name;
+    const oppShort = f.is_home ? f.away_short : f.home_short;
+    const inTitle =
+      t.includes(opp.toLowerCase()) ||
+      t.includes(oppShort.toLowerCase());
+    if (!inTitle) continue;
+    const delta = Math.abs(new Date(f.kickoff).getTime() - pubMs);
+    if (delta < 7 * 86_400_000 && delta < bestDelta) {
+      best = f;
+      bestDelta = delta;
+    }
+  }
+  return best;
+}
+
 // Pick articles missing EITHER field, so the script repopulates ai_title for
 // pre-V1.1 articles that already have ai_synthesis.
 const where = FORCE ? sql`` : sql`where a.ai_title is null or a.ai_synthesis is null`;
@@ -150,7 +216,8 @@ let fail = 0;
 for (const a of articles) {
   process.stdout.write(`  ${a.title.slice(0, 60).padEnd(60)} `);
   try {
-    const { title, synthesis } = await synthesize(a);
+    const fixture = matchFixture(a);
+    const { title, synthesis } = await synthesize(a, fixture);
     if (!title || !synthesis) throw new Error('parse failed');
     if (DRY) {
       console.log(`(dry)`);
