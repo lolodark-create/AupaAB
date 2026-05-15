@@ -34,8 +34,10 @@ interface Props {
 const { coverImageUrl, ...rest } = Astro.props;
 ---
 
-<div class:list={['relative w-full h-full overflow-hidden bg-night', rest.class]}>
-  {/* Chip fallback at the bottom of the stack. */}
+<div class:list={['relative isolate w-full h-full overflow-hidden bg-night', rest.class]}>
+  {/* `isolate` creates a new stacking context here. Without it, the img's
+      z-10 escaped to the root and collided with the sticky filter bar
+      (also z-10) — the photo painted over the chips while scrolling. */}
   <div class="absolute inset-0 z-0">
     <EditorialThumb {...rest} />
   </div>
